@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+{% block app_content %}
+	<div class="container text-center">
+		<div class="row">
+			<div class="col-sm-3 col-1">
+			</div>
+			<div class="col-sm-6 col-10" id="index-heading">
+				<p>Your convenience is our priority.</p>
+				<p>Let us do the work while you relax.</p>
+				<p>Make a Request and we'll handle the rest.</p>
+			</div>
+			<div class="col-sm-3 col-1">
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-sm-3 col-1">
+			</div>
+			<div class="col-sm-6 col-10">
+				<img src="https://res.cloudinary.com/substr/image/upload/v1549556532/Substr-512.png" alt="substr rider icon" title="substr rider icon">
+			</div>
+			<div class="col-sm-3 col-1">
+			</div>
+		</div>
+	</div>
+  
+    
+{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<style>
+#index-heading {
+	font-family: 'Roboto Mono', monospace;
+	font-size: 18px;
+}
+#index-heading p {
+	margin-bottom: 0rem;
+}
+
+@media (max-width: 576px) { 
+	#index-heading {
+		font-size: 14px;
+	}
+
+}
+</style>
+{% endblock %}
