@@ -3,6 +3,12 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from datetime import datetime
 
+admins = db.Table('admins',
+	db.Column('user', db.Integer, db.ForeignKey('user.id')),
+	db.Column('company', db.Integer, db.ForeignKey('company.id')),
+)
+
+
 @login.user_loader
 def load_user(id):
     return User.query.get(int(id))
@@ -37,3 +43,20 @@ class User(UserMixin, db.Model):
 		except:
 			return
 		return User.query.get(id)
+		
+class Company(db.Model):
+	id = db.Column(db.Integer, primary_key=True)
+	name = db.Column(db.String(64))
+	address = db.Column(db.String(128))
+	contact = db.Column(db.String(64))
+	email = db.Column(db.String(64), unique=True)
+	social_id = db.Column(db.String(64), unique=True)
+	business_type = db.Column(db.String(64))
+	admin_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+	date_requested = db.Column(db.DateTime, default=datetime.utcnow)
+	date_approved = db.Column(db.DateTime)
+	
+	admins = db.relationship(
+		'User', secondary='admins',
+		backref=db.backref('company', lazy='dynamic'), lazy='dynamic'
+	)

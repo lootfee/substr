@@ -3,20 +3,12 @@
 
 {% block app_content %}
 <div class="container">
+	<div class="col-md-5 col-sm-10 col-10">
     <h1>Sign In</h1>
-    <form action="" method="post" novalidate>
-        {{ form.hidden_tag() }}
-        <p>
-            {{ form.username.label }}<br>
-            {{ form.username(size=32) }}
-        </p>
-        <p>
-            {{ form.password.label }}<br>
-            {{ form.password(size=32) }}
-        </p>
-        <p>{{ form.remember_me() }} {{ form.remember_me.label }}</p>
-        <p>{{ form.submit() }}</p>
-    </form>
+	{{ wtf.quick_form(form)}}
+	</div>
+	<br>
+    <div>
 	 <p><a href="{{ url_for('oauth_authorize', provider='facebook') }}"><button class="btn btn-primary" type="button" style="padding: 4px; border-radius: 4px;"><img src="https://res.cloudinary.com/substr/image/upload/v1549692064/facebook.png" width="20px;"> Login with Facebook</button></a></p>
 	<p>
         Not yet registered?
@@ -26,5 +18,15 @@
         Forgot Your Password?
         <a href="{{ url_for('reset_password_request') }}">Click to Reset It</a>
     </p>
+	</div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+{{ super()}}
+<script>
+$(document).ready(function() {
+	$("#submit").addClass("btn btn-primary");
+});
+</script>
 {% endblock %}

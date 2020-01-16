@@ -24,3 +24,4 @@ class Config(object):
 			'secret': os.getenv('TWITTER_SECRET')
 		}
 	}
+	LOG_TO_STDOUT = os.getenv('LOG_TO_STDOUT')
