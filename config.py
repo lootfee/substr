@@ -16,8 +16,8 @@ class Config(object):
 	ADMINS = ['your-email@example.com']
 	OAUTH_CREDENTIALS = {
 		'facebook': {
-			'id': os.getenv('FACEBOOK_ID'),
-			'secret': os.getenv('FACEBOOK_SECRET')
+			'id': os.getenv('FACEBOOK_LIVE_ID'),
+			'secret': os.getenv('FACEBOOK_LIVE_SECRET')
 		},
 		'twitter': {
 			'id': os.getenv('TWITTER_ID'),
