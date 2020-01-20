@@ -13,11 +13,11 @@ class Config(object):
 	MAIL_USE_TLS = os.getenv('MAIL_USE_TLS') is not None
 	MAIL_USERNAME = os.getenv('MAIL_USERNAME')
 	MAIL_PASSWORD = os.getenv('MAIL_PASSWORD')
-	ADMINS = ['your-email@example.com']
+	ADMINS = os.getenv('ADMINS')
 	OAUTH_CREDENTIALS = {
 		'facebook': {
-			'id': os.getenv('FACEBOOK_LIVE_ID'),
-			'secret': os.getenv('FACEBOOK_LIVE_SECRET')
+			'id': os.getenv('FACEBOOK_TEST_ID'),
+			'secret': os.getenv('FACEBOOK_TEST_SECRET')
 		},
 		'twitter': {
 			'id': os.getenv('TWITTER_ID'),
@@ -25,3 +25,4 @@ class Config(object):
 		}
 	}
 	LOG_TO_STDOUT = os.getenv('LOG_TO_STDOUT')
+	UPLOADED_PHOTOS_DEST = os.getcwd() + '/app/static/uploads'

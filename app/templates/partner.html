@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+{% block app_content %}
+<div class="container">
+	<div class="row">
+		<div class="col-md-12 col-sm-12 col-12 text-center">
+			<div class="card">
+			  <div class="card-header">
+				<img id="comp_cover_pic" class="card-img-top img-fluid" src="{{ company.cover_pic }}" alt="{{ company.name }} cover picture">
+				{% if current_user.is_company_admin(company) %}
+				<div class="text-right"><a class="card-text" href="{{url_for('manage_company', comp_name=company.name, comp_hash=company.company_hash)}}">Manage</a></div>
+				{% endif %}
+			  </div>
+			  <div class="card-body text-center">
+				<h1 class="card-title">{{ company.name }}</h1>
+				<h5 class="card-subtitle" style="color: #b3b3b3;">{{ company.description }}</h5>
+				
+			  </div>
+			</div>
+		</div>
+	</div>
+	<br>
+	<div class="row">
+		<div class="col-md-12 col-sm-12 col-12">
+			<div class="text-center">
+				<h3>Menu</h3>
+			</div>
+			<div id="accordion">
+			  <div class="card">
+				<div class="card-header text-center" id="headingOne">
+				  <h5 class="mb-0">
+					<button class="btn btn-link" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+					  Collapsible Group Item #1
+					</button>
+				  </h5>
+				</div>
+				<div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
+				  <div class="card-body">
+					Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
+				  </div>
+				</div>
+			  </div>
+			</div>
+		</div>
+	</div>
+	
+</div>
+{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<style>
+#comp_cover_pic {
+	height: 350px;
+}
+</style>
+{% endblock %}

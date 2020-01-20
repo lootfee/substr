@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+{% block app_content %}
+<div class="container">
+	<div class="text-center">
+		<h3>Manage <a href="{{url_for('partner', comp_name=company.name, comp_hash=company.company_hash)}}">{{ company.name }}</a></h3>
+	</div>
+	<br>
+	<div class="row">
+		<div class="col-md-5 offset-md-0 col-sm-10 offset-sm-1 col-10 offset-1" style="padding: 0;">
+			<button class="btn btn-primary collapse_card_btn" type="button" data-toggle="collapse" data-target="#edit_profile_card" aria-expanded="false" aria-controls="edit_profile_card"><h5>Edit Profile</h5></button>
+			<div class="card col-md-12 col-sm-12 col-12 collapse" id="edit_profile_card">
+				{{ wtf.quick_form(edit_comp_form)}}
+			</div>
+			
+		</div>
+		<br>
+		<div class="col-md-5 offset-md-1 col-sm-10 offset-sm-1 col-10 offset-1" style="padding: 0;">
+			<button class="btn btn-primary collapse_card_btn" type="button" data-toggle="collapse" data-target="#manage_admin_card" aria-expanded="false" aria-controls="manage_admin_card"><h5>Manage Admins</h5></button>
+			<div class="card col-md-12 col-sm-12 col-12 collapse" id="manage_admin_card">
+				{{ wtf.quick_form(add_admin_form) }}
+				{% if company.admins.count() > 0 %}
+				<table class="table table-bordered table-hover">
+					<thead class="thead-dark">
+						<th scope="col">Admins</th>
+					</thead>
+					<tbody>
+						<tr>
+							<td>{% for c in company.admins %}{{ c.username }}{% endfor %}</td>
+						</tr>
+					</tbody>
+				</table>
+				{% endif %}
+			</div>
+			<br>
+			<button class="btn btn-primary collapse_card_btn" type="button" data-toggle="collapse" data-target="#manage_staff_card" aria-expanded="false" aria-controls="manage_staff_card"><h5>Manage Staffs</h5></button>
+			<div class="card col-md-12 col-sm-12 col-12 collapse" id="manage_staff_card">
+				{{ wtf.quick_form(add_staff_form) }}
+				{% if company.staffs.count() > 0 %}
+				<table class="table table-bordered table-hover">
+					<thead class="thead-dark">
+						<th scope="col">Staffs</th>
+					</thead>
+					<tbody>
+						<tr>
+							<td>{% for c in company.staffs %}{{ c.username }}{% endfor %}</td>
+						</tr>
+					</tbody>
+				</table>
+				{% endif %}
+			</div>
+		</div>
+	</div>
+	<br>
+	<div class="row">
+		<div class="col-md-12 col-sm-12 col-12 text-center">
+			<h4>Manage Menu</h4>
+		</div>
+	</div>
+	<br>
+	<div class="row">
+		<div class="col-md-5 offset-md-0 col-sm-10 offset-sm-1 col-10 offset-1"  style="padding: 0;">
+			<button class="btn btn-primary collapse_card_btn" type="button" data-toggle="collapse" data-target="#manage_submenu_card" aria-expanded="false" aria-controls="manage_submenu_card"><h5>Manage Submenu</h5></button>
+			<div class="card col-md-12 col-sm-12 col-12 collapse" id="manage_submenu_card">
+			{{ wtf.quick_form(add_submenu_form) }}
+			</div>
+		</div>
+		<div class="col-md-5 offset-md-1 col-sm-10 offset-sm-1 col-10 offset-1"  style="padding: 0;">
+			<button class="btn btn-primary collapse_card_btn" type="button" data-toggle="collapse" data-target="#submenu_list_card" aria-expanded="false" aria-controls="submenu_list_card"><h5>Submenu list</h5></button>
+			<div class="card col-md-12 col-sm-12 col-12 collapse" id="submenu_list_card">
+				<table class="table table-bordered table-hover add_md_break">
+					<thead class="thead-dark">
+						<th scope="col">Submenus</th>
+					</thead>
+					<tbody>
+						<tr>
+							<td style="font-weight: bold;">{% for c in company.submenus %}{{ c.name }}{% endfor %}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	
+</div>
+{% endblock %}
+
+{% block styles %}
+{{super()}}
+<style>
+#submit_ecf, #submit_staff_form, #submit_admin_form, #submit_submenu_form {
+	margin-bottom: 20px;
+}
+
+.control-label {
+	font-weight: 700; 
+}
+
+.edit_header {
+	font-size: 18px;
+    font-weight: 700;
+    margin: 10px auto;
+}
+
+.add_md_break {
+	margin-top: 20px;
+}
+
+.collapse_card_btn {
+	width: 100%;
+}
+
+.card form {
+	margin-top: 10px;
+}
+
+@media (max-width: 575.98px) { 
+	
+	.add_sm_break {
+		margin-top: 20px;
+	}
+
+}
+</style>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+$(document).ready(function() {
+	$(".btn").addClass("btn-primary");
+	
+	/*   jqueryui   autocomplete  */
+    var cache = {};
+    $( "#input_admin" ).autocomplete({
+		source: function( request, response ) {
+			$.ajax( {
+			  url: "{{url_for('users_api')}}",
+			  //dataType: "json",
+			  data: {
+				term: request.term,
+			  },
+			  success: function( data ) {
+				var data_list = []
+				$.each(data, function(i, val){
+					$.each(val, function(key, val2){
+						data_list.push(val2);
+					});
+				});
+				response( data_list )
+				//console.log(data_list)
+			  }
+			});
+		},
+		minLength: 2,
+    });
+ 
+});
+
+</script>
+{% endblock %}

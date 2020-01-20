@@ -1,14 +1,33 @@
-from flask import render_template, flash, redirect, url_for, request
-from app import app, db, mail
+from flask import render_template, flash, redirect, url_for, request, jsonify
+from app import app, db, mail, photos
 from flask_login import current_user, login_user, login_required, logout_user
-from app.models import User
-from app.forms import LoginForm, RegistrationForm, EditProfileForm, ResetPasswordRequestForm, ResetPasswordForm, BecomePartnerForm
+from app.models import User, Company, Submenu
+from app.forms import LoginForm, RegistrationForm, EditProfileForm, ResetPasswordRequestForm, ResetPasswordForm, BecomePartnerForm, EditCompanyForm, AddAdminForm, AddStaffForm, AddSubMenuForm
 from werkzeug.urls import url_parse
 from datetime import datetime
 from app.email import send_password_reset_email
 from oauth import OAuthSignIn
 from flask_mail import Message
+import json
+from sqlalchemy.orm import class_mapper
 
+
+'''def serialize(model):  for creating json from sqlalchemy
+  """Transforms a model into a dictionary which can be dumped to JSON."""
+  # first we get the names of all the columns on your model
+  columns = [c.key for c in class_mapper(model.__class__).columns]
+  # then we return their values in a dict
+  return dict((c, getattr(model, c)) for c in columns)'''
+
+@app.route('/api/v1/users/all', methods=['GET', 'POST'])
+def users_api():
+	users = User.query.all()
+	user_list= []
+	for u in users:
+		user_dict = {"username": u.username}
+		user_list.append(user_dict)
+	return jsonify(user_list)
+	
 
 @app.before_request
 def before_request():
@@ -16,17 +35,23 @@ def before_request():
         current_user.last_seen = datetime.utcnow()
         db.session.commit()
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
 def index():
 	become_partner_form = BecomePartnerForm()
 	if become_partner_form.validate_on_submit():
-		company = Company(name=become_partner_form.business_name.data, address=become_partner_form.business_address.data, contact=become_partner_form.contact_info.data, email=become_partner_form.email.data)
+		company = Company(name=become_partner_form.business_name.data, business_type=become_partner_form.business_type.data, address=become_partner_form.business_address.data, contact=become_partner_form.contact_info.data, email=become_partner_form.email.data)
 		db.session.add(company)
 		db.session.commit()
-		msg = Message("Substr Partner Request", sender="support@labapp.tech", recipients=["support@labapp.tech"])
+		msg = Message("Substr Partner Request", sender=app.config['MAIL_USERNAME'], recipients=["substr@labapp.tech"])
 		msg.html = "<h5>" + become_partner_form.business_name.data  + " is inquiring to be a partner.</h5><p>Business address: " +  become_partner_form.business_address.data  + "</p><p>Email: " +  become_partner_form.email.data + "</p><p>Contact: " +  become_partner_form.contact_info.data  + "</p><p>Message: " + become_partner_form.message.data + "</p>"
 		mail.send(msg)
+		try:
+			mail.send(msg)
+		except smtplib.SMTPRecipientsRefused:
+			return redirect(url_for('index'))
+		except smtplib.SMTPRecipientsRefused:
+			return redirect(url_for('index'))
 		return redirect(url_for('index'))
 	return render_template('index.html', become_partner_form=become_partner_form)
 	
@@ -158,4 +183,80 @@ def user():
 @app.route('/admin', methods=['GET', 'POST'])
 @login_required
 def admin():
-	return render_template('admin.html')
+	pending_requests = Company.query.filter(Company.date_requested.isnot(None)).filter_by(date_approved=None).all()
+	partners = Company.query.filter(Company.date_approved.isnot(None)).all()
+	return render_template('admin.html', pending_requests=pending_requests, partners=partners)
+	
+
+@app.route('/approve_request/<comp_id>')
+@login_required
+def approve_request(comp_id):
+	approved_company = Company.query.filter_by(id=comp_id).first()
+	approved_company.date_approved = datetime.utcnow()
+	for_hash = approved_company.name + approved_company.date_approved.strftime("%m%d%Y%H%M%S")
+	approved_company.set_company_hash(for_hash)
+	db.session.commit()
+	return redirect(url_for('admin'))
+	
+@app.route('/reject_request/<comp_id>')
+@login_required
+def reject_request(comp_id):
+	company = Company.query.get(comp_id)
+	db.session.delete(company)
+	db.session.commit()
+	return redirect(url_for('admin'))
+	
+	
+@app.route('/partner/<comp_name>/<comp_hash>', methods=['GET', 'POST'])
+@login_required
+def partner(comp_name, comp_hash):
+	company = Company.query.filter_by(company_hash=comp_hash).first()
+	return render_template('partner.html', company=company)
+	
+@app.route('/manage_company/<comp_name>/<comp_hash>', methods=['GET', 'POST'])
+@login_required
+def manage_company(comp_name, comp_hash):
+	company = Company.query.filter_by(company_hash=comp_hash).first()
+	edit_comp_form = EditCompanyForm(company.email)
+	if edit_comp_form.submit_ecf.data:
+		if edit_comp_form.validate_on_submit():
+			company.name = edit_comp_form.business_name.data
+			company.business_type = edit_comp_form.business_type.data
+			company.address = edit_comp_form.business_address.data
+			company.contact = edit_comp_form.contact_info.data
+			company.email = edit_comp_form.email.data
+			company.description = edit_comp_form.company_description.data
+			if edit_comp_form.cover_pic.data:
+				cover_pic_filename = photos.save(edit_comp_form.cover_pic.data)
+				company.cover_pic = photos.url(cover_pic_filename)
+			db.session.commit()
+			return redirect(url_for('manage_company', comp_hash=company.company_hash, comp_name=company.name))
+	elif request.method == 'GET':
+		edit_comp_form.business_name.data = company.name
+		edit_comp_form.business_type.data = company.business_type 
+		edit_comp_form.business_address.data = company.address
+		edit_comp_form.contact_info.data = company.contact
+		edit_comp_form.email.data = company.email
+		edit_comp_form.company_description.data = company.description
+	add_admin_form = AddAdminForm()
+	if add_admin_form.submit_admin_form.data:
+		if add_admin_form.validate_on_submit():
+			user = User.query.filter_by(username=add_admin_form.input_admin.data).first()
+			company.admins.append(user)
+			db.session.commit()
+			return redirect(url_for('manage_company', comp_hash=company.company_hash, comp_name=company.name))
+	add_staff_form = AddStaffForm()
+	if add_staff_form.submit_staff_form.data:
+		if add_staff_form.validate_on_submit():
+			user = User.query.filter_by(username=add_staff_form.input_staff.data).first()
+			company.staffs.append(user)
+			db.session.commit()
+			return redirect(url_for('manage_company', comp_hash=company.company_hash, comp_name=company.name))
+	add_submenu_form = AddSubMenuForm()
+	if add_submenu_form.submit_submenu_form.data:
+		if add_submenu_form.validate_on_submit():
+			submenu = Submenu(name=add_submenu_form.input_submenu.data, description=add_submenu_form.submenu_description.data, company_id=company.id)
+			db.session.add(submenu)
+			db.session.commit()
+			return redirect(url_for('manage_company', comp_hash=company.company_hash, comp_name=company.name))
+	return render_template('manage_company.html', company=company, edit_comp_form=edit_comp_form, add_admin_form=add_admin_form, add_staff_form=add_staff_form, add_submenu_form=add_submenu_form)

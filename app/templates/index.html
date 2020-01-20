@@ -67,7 +67,7 @@
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <div class="modal-body">
+      <div class="modal-body" id="bpf_container">
         {{ wtf.quick_form(become_partner_form)}}
       </div>
       <div class="modal-footer">
@@ -93,7 +93,12 @@
 	margin: 0 auto;
 }
 
-
+#bpf_container form .help-block,
+#bpf_container form .error {
+	background-color: #f3b7b7;
+    padding: 4px;
+    border-radius: 3px;
+}
 
 @media (max-width: 576px) { 
 	#index-heading {
@@ -109,6 +114,11 @@
 <script>
 $(document).ready(function() {
 	$("#submit_bpf").addClass("btn btn-primary");
+});
+$(window).on('load',function(){
+	if ($("#bpf_container").has("form p.help-block").length !== 0){
+		$('#become_partner_modal').modal('show');
+	}
 });
 </script>
 {% endblock %}

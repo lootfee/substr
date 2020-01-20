@@ -2,7 +2,67 @@
 {% import 'bootstrap/wtf.html' as wtf %}
 
 {% block app_content %}
-	<div class="container text-center">
-		<p>Welcome admin</p>
+<div class="container">
+	{% if pending_requests %}
+	<div class="row">
+		<div class="col-md-12 col-sm-12 col-12">
+			<h4>Partner requests</h4>
+		</div>
 	</div>
+	<table class="table table-hover">
+		<thead>
+			<th scope="col">Name</th>
+			<th scope="col">Type</th>
+			<th scope="col">Address</th>
+			<th scope="col">Email</th>
+			<th scope="col">Contact</th>
+			<th scope="col">Action</th>
+		</thead>
+		<tbody>
+			{% for p in pending_requests %}
+			<tr>
+			<th scope="row">{{ p.name }}</th>
+			<td>{{ p.business_type }}</td>
+			<td>{{ p.address }}</td>
+			<td>{{ p.email }}</td>
+			<td>{{ p.contact }}</td>
+			<td>
+				<a href="{{url_for('approve_request', comp_id=p.id) }}"><button class="btn btn-sm btn-primary">Accept</button></a>
+				<a href="{{url_for('reject_request', comp_id=p.id) }}"><button class="btn btn-sm btn-warning">Reject</button></a>
+			</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+	{% endif %}
+	{% if partners %}
+	<div class="row">
+		<div class="col-md-12 col-sm-12 col-12">
+			<h4>Current partners</h4>
+		</div>
+	</div>
+	<table class="table table-hover">
+		<thead>
+			<th scope="col">Name</th>
+			<th scope="col">Type</th>
+			<th scope="col">Address</th>
+			<th scope="col">Email</th>
+			<th scope="col">Contact</th>
+			<th scope="col">Action</th>
+		</thead>
+		<tbody>
+			{% for p in partners %}
+			<tr>
+			  <th scope="row"><a href="{{ url_for('partner', comp_name=p.name, comp_hash=p.company_hash)}}">{{ p.name }}</a></th>
+			  <td>{{ p.business_type }}</td>
+			  <td>{{ p.address }}</td>
+			  <td>{{ p.email }}</td>
+			  <td>{{ p.contact }}</td>
+			   <td><a href="{{ url_for('edit_company', comp_name=p.name, comp_hash=p.company_hash ) }}"><button class="btn btn-sm btn-info">Edit</button></a></td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+	{% endif %}
+</div>
 {% endblock %}
