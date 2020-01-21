@@ -93,3 +93,24 @@ class Submenu(db.Model):
 	name = db.Column(db.String(128))
 	description = db.Column(db.String(1000))
 	company_id = db.Column(db.Integer, db.ForeignKey('company.id'))
+	submenu_hash = db.Column(db.String(128))
+	
+	foods = db.relationship('FoodItem', backref=db.backref('of_submenu', lazy=True), lazy='dynamic')
+	
+	def set_submenu_hash(self, name):
+		self.submenu_hash = hashlib.sha256(name.encode('utf-8')).hexdigest()
+		
+		
+class FoodItem(db.Model):
+	id = db.Column(db.Integer, primary_key=True)
+	name = db.Column(db.String(128))
+	price = db.Column(db.Numeric(10,2))
+	description = db.Column(db.String(1000))
+	cover_pic = db.Column(db.String(1000))
+	company_id = db.Column(db.Integer, db.ForeignKey('company.id'))
+	submenu_id = db.Column(db.Integer, db.ForeignKey('submenu.id'))
+	food_item_hash = db.Column(db.String(128))
+	
+	def set_food_item_hash(self, name):
+		self.food_item_hash = hashlib.sha256(name.encode('utf-8')).hexdigest()
+	

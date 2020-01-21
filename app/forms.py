@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from app import app, photos
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField, SelectField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField, SelectField, IntegerField, FloatField
 from wtforms.validators import DataRequired, ValidationError, Email, EqualTo, Length
 from app.models import User, Company
 from flask_wtf.file import FileField, FileRequired, FileAllowed
@@ -111,6 +111,14 @@ class AddStaffForm(FlaskForm):
 	
 
 class AddSubMenuForm(FlaskForm):
-	input_submenu = StringField('Add/Edit submenu', validators=[DataRequired()], render_kw={"placeholder": "e.g. Breakfast Menu, Lunch Menu, Chicken Menu"})
+	input_submenu = StringField('Add submenu', validators=[DataRequired()], render_kw={"placeholder": "e.g. Breakfast Menu, Lunch Menu, Chicken Menu"})
 	submenu_description = TextAreaField('Description', validators=[DataRequired()])
 	submit_submenu_form = SubmitField('Submit')
+	
+	
+class AddFoodItemForm(FlaskForm):
+	food_item_name = StringField('Name', validators=[DataRequired()])
+	food_item_price = FloatField('Price', validators=[DataRequired()])
+	food_item_description = TextAreaField('Description', validators=[DataRequired()])
+	food_item_pic = FileField('Picture (100 kB max size):', validators=[FileAllowed(photos)])
+	submit_food_item_form = SubmitField('Submit')

@@ -1,8 +1,8 @@
 from flask import render_template, flash, redirect, url_for, request, jsonify
 from app import app, db, mail, photos
 from flask_login import current_user, login_user, login_required, logout_user
-from app.models import User, Company, Submenu
-from app.forms import LoginForm, RegistrationForm, EditProfileForm, ResetPasswordRequestForm, ResetPasswordForm, BecomePartnerForm, EditCompanyForm, AddAdminForm, AddStaffForm, AddSubMenuForm
+from app.models import User, Company, Submenu, FoodItem
+from app.forms import LoginForm, RegistrationForm, EditProfileForm, ResetPasswordRequestForm, ResetPasswordForm, BecomePartnerForm, EditCompanyForm, AddAdminForm, AddStaffForm, AddSubMenuForm, AddFoodItemForm
 from werkzeug.urls import url_parse
 from datetime import datetime
 from app.email import send_password_reset_email
@@ -256,7 +256,55 @@ def manage_company(comp_name, comp_hash):
 	if add_submenu_form.submit_submenu_form.data:
 		if add_submenu_form.validate_on_submit():
 			submenu = Submenu(name=add_submenu_form.input_submenu.data, description=add_submenu_form.submenu_description.data, company_id=company.id)
+			for_hash = submenu.name + str(submenu.id) + str(company.id)
+			submenu.set_submenu_hash(for_hash)
 			db.session.add(submenu)
 			db.session.commit()
 			return redirect(url_for('manage_company', comp_hash=company.company_hash, comp_name=company.name))
 	return render_template('manage_company.html', company=company, edit_comp_form=edit_comp_form, add_admin_form=add_admin_form, add_staff_form=add_staff_form, add_submenu_form=add_submenu_form)
+	
+	
+@app.route('/remove_admin/<comp_hash>/<admin_id>', methods=['GET', 'POST'])
+@login_required
+def remove_admin(comp_hash, admin_id):
+	company = Company.query.filter_by(company_hash=comp_hash).first()
+	user = User.query.filter_by(id=admin_id).first()
+	company.admins.remove(user)
+	return redirect(url_for('manage_company', comp_hash=company.company_hash, comp_name=company.name))
+	
+
+@app.route('/remove_staff/<comp_hash>/<staff_id>', methods=['GET', 'POST'])
+@login_required
+def remove_staff(comp_hash, staff_id):
+	company = Company.query.filter_by(company_hash=comp_hash).first()
+	user = User.query.filter_by(id=staff_id).first()
+	company.staffs.remove(user)
+	return redirect(url_for('manage_company', comp_hash=company.company_hash, comp_name=company.name))
+	
+
+	
+@app.route('/manage_submenu/<submenu_name>/<submenu_hash>', methods=['GET', 'POST'])
+@login_required
+def manage_submenu(submenu_name, submenu_hash):
+	submenu = Submenu.query.filter_by(submenu_hash=submenu_hash).first()
+	foods = FoodItem.query.filter_by(submenu_id=submenu.id).order_by(FoodItem.name.asc()).all()
+	edit_submenu_form = AddSubMenuForm()
+	if edit_submenu_form.submit_submenu_form.data:
+		if edit_submenu_form.validate_on_submit():
+			submenu.name = edit_submenu_form.input_submenu.data, 
+			submenu.description = edit_submenu_form.submenu_description.data,
+			db.session.commit()
+			return redirect(url_for('manage_submenu', submenu_name=submenu.name, submenu_hash=submenu.submenu_hash))
+	food_item_form = AddFoodItemForm()
+	if food_item_form.submit_food_item_form.data:
+		if food_item_form.validate_on_submit():
+			food_item = FoodItem(name=food_item_form.food_item_name.data, price=food_item_form.food_item_price.data, description=food_item_form.food_item_description.data, company_id=submenu.company_id, submenu_id=submenu.id)
+			for_hash = food_item.name + str(food_item.id) + str(submenu.company_id) + str(food_item.price)
+			food_item.set_food_item_hash(for_hash)
+			if food_item_form.food_item_pic.data:
+				food_item_pic_filename = photos.save(food_item_form.food_item_pic.data)
+				food_item.cover_pic = photos.url(food_item_pic_filename)
+			db.session.add(food_item)
+			db.session.commit()
+			return redirect(url_for('manage_submenu', submenu_name=submenu.name, submenu_hash=submenu.submenu_hash))
+	return render_template('submenu.html', submenu=submenu, edit_submenu_form=edit_submenu_form, food_item_form=food_item_form, foods=foods)

@@ -2,7 +2,7 @@
 
 
 {% block title %}
-    {% if title %}{{ title }} - Substr {% endif %}
+    {% if title %}{{ title }} - Substr {% else %} Substr {% endif %}
 {% endblock %}
 
 {% block navbar %}
@@ -11,7 +11,7 @@
 		  <a class="navbar-brand" href="{{ url_for('index') }}">
 			<img title="Home" alt="substr logo" src="https://res.cloudinary.com/substr/image/upload/v1549541706/Susbtr_text.png" width="100" height="50">
 		  </a>
-		  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+		  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation" style="border: 2px solid #0038dc;">
 			<span class="navbar-toggler-icon"></span>
 		  </button>
 
@@ -103,6 +103,14 @@
 	}
 	nav.navbar {
 		background-color: #ffffff;
+	}
+	.navbar-toggler {
+		    border: 2px solid #0038dc;
+	}
+	.help-block {
+		background: #ef757575;
+		border-radius: 4px;
+		padding: 4px;
 	}
 </style>
 {% endblock %}

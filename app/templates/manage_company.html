@@ -27,7 +27,7 @@
 					</thead>
 					<tbody>
 						<tr>
-							<td>{% for c in company.admins %}{{ c.username }}{% endfor %}</td>
+							<td>{% for c in company.admins %}{{ c.username }} <span style="float: right;"><a href="{{ url_for('remove_admin', comp_hash=company.company_hash, admin_id=c.id)}}">Remove admin</a></span>{% endfor %}</td>
 						</tr>
 					</tbody>
 				</table>
@@ -75,7 +75,7 @@
 					</thead>
 					<tbody>
 						<tr>
-							<td style="font-weight: bold;">{% for c in company.submenus %}{{ c.name }}{% endfor %}</td>
+							<td style="font-weight: bold;">{% for c in company.submenus %}{{ c.name }} <span style="float: right;"><a href="{{ url_for('manage_submenu', submenu_name=c.name, submenu_hash=c.submenu_hash) }}">Manage Content</a></span>{% endfor %}</td>
 						</tr>
 					</tbody>
 				</table>

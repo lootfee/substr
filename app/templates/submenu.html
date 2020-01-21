@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+{% block app_content %}
+<div class="container">
+	<div class="row">
+		<div class=" col-md-12 text-center">
+			<h4>{{ submenu.name }}</h4>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-5 offset-md-1">
+			<div class="card" style="padding: 20px;">
+				<h5>Edit {{ submenu.name }} name/description</h5>
+				{{wtf.quick_form(edit_submenu_form)}}
+			</div>
+		</div>
+		<div class="col-md-5 add_sm_break">
+			<div class="card" style="padding: 20px;">
+				<h5>Add food item for {{ submenu.name }}</h5>
+				{{wtf.quick_form(food_item_form)}}
+			</div>
+		</div>
+	</div>
+	<br>
+	
+	<div class="col-md-12">
+		<div class="row">
+			<div class=" col-md-12 text-center">
+				<h5>{{ submenu.name }} Items</h5>
+			</div>
+		</div>
+		<div class="row">
+			{% for food in foods %}
+			<div class="col-md-3 offset-md-0 col-sm-10 offset-sm-1 col-xs-10 offset-xs-1 add_sm_break">
+				<div class="card" style="height:340px;">
+				  <img src="{{ food.cover_pic }}" class="card-img-top" alt="{{ food.name }}" height="160px;">
+				  <div class="card-body">
+					<h5 class="card-title">{{ food.name }} - P{{ food.price }}</h5>
+					<p class="card-text">{{ food.description }}</p>
+					<a href="#" class="btn btn-primary">Add to cart</a>
+				  </div>
+				</div>
+			</div>
+			{% endfor %}
+		</div>
+	</div>
+	
+</div>
+{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<style>
+@media (max-width: 575.98px) { 
+	
+	.add_sm_break {
+		margin-top: 20px;
+	}
+
+}
+</style>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+$(document).ready(function() {
+	$('.control-label[for=input_submenu]').html('Edit Submenu Name')
+	$('.control-label[for=submenu_description]').html('Edit Submenu Description')
+	$("#submit_submenu_form").addClass("btn btn-primary");
+	$("#submit_food_item_form").addClass("btn btn-primary");
+	
+});
+$("#food_item_pic").on("change", function (e) {
+	var size = $(this)[0].files[0].size;
+	if (size > 100000) {
+		$(this).after("<p id='file_size_alert' class='alert alert-danger alert-dismissible' role='alert'>File size too large! Please change or edit image size.</p>");
+		$("#submit").css('display', 'none');
+	}
+	else{
+		$("#file_size_alert").css('display', 'none');
+		$("#submit").css('display', 'block');
+	}
+});
+</script>
+{% endblock %}

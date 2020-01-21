@@ -8,14 +8,13 @@
 			<div class="card">
 			  <div class="card-header">
 				<img id="comp_cover_pic" class="card-img-top img-fluid" src="{{ company.cover_pic }}" alt="{{ company.name }} cover picture">
-				{% if current_user.is_company_admin(company) %}
-				<div class="text-right"><a class="card-text" href="{{url_for('manage_company', comp_name=company.name, comp_hash=company.company_hash)}}">Manage</a></div>
-				{% endif %}
 			  </div>
 			  <div class="card-body text-center">
 				<h1 class="card-title">{{ company.name }}</h1>
 				<h5 class="card-subtitle" style="color: #b3b3b3;">{{ company.description }}</h5>
-				
+				{% if current_user.is_company_admin(company) %}
+				<div class="text-right"><a class="card-text" href="{{url_for('manage_company', comp_name=company.name, comp_hash=company.company_hash)}}">Manage</a></div>
+				{% endif %}
 			  </div>
 			</div>
 		</div>
