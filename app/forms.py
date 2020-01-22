@@ -85,7 +85,7 @@ class EditCompanyForm(FlaskForm):
 	business_address = StringField('Business address', validators=[DataRequired()])
 	email = StringField('Email', validators=[DataRequired(), Email()])
 	contact_info = StringField('Contact number', validators=[DataRequired()])
-	cover_pic = FileField('Upload Cover Pic (600 kB max size):', validators=[FileAllowed(photos)])
+	cover_pic = FileField('Upload Cover Pic (50 kB max size):', validators=[FileAllowed(photos)])
 	company_description = TextAreaField('Company description', validators=[DataRequired()])
 	submit_ecf = SubmitField('Submit')
 	
@@ -119,6 +119,6 @@ class AddSubMenuForm(FlaskForm):
 class AddFoodItemForm(FlaskForm):
 	food_item_name = StringField('Name', validators=[DataRequired()])
 	food_item_price = FloatField('Price', validators=[DataRequired()])
-	food_item_description = TextAreaField('Description', validators=[DataRequired()])
-	food_item_pic = FileField('Picture (100 kB max size):', validators=[FileAllowed(photos)])
+	food_item_description = TextAreaField('Description', validators=[DataRequired(), Length(max=100)])
+	food_item_pic = FileField('Picture (20 kB max size):', validators=[FileAllowed(photos)])
 	submit_food_item_form = SubmitField('Submit')

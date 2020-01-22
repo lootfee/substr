@@ -38,6 +38,12 @@ def before_request():
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
 def index():
+	restaurants = Company.query.filter(Company.date_approved.isnot(None), Company.cover_pic.isnot(None)).filter_by(business_type='Restaurant').order_by(Company.name.asc()).all()
+	for r in restaurants:
+		r.show_order = 0
+	for n in range(0, len(restaurants)):
+		r.show_order = n
+		print(r.show_order)
 	become_partner_form = BecomePartnerForm()
 	if become_partner_form.validate_on_submit():
 		company = Company(name=become_partner_form.business_name.data, business_type=become_partner_form.business_type.data, address=become_partner_form.business_address.data, contact=become_partner_form.contact_info.data, email=become_partner_form.email.data)
@@ -53,7 +59,7 @@ def index():
 		except smtplib.SMTPRecipientsRefused:
 			return redirect(url_for('index'))
 		return redirect(url_for('index'))
-	return render_template('index.html', become_partner_form=become_partner_form)
+	return render_template('index.html', become_partner_form=become_partner_form, restaurants=restaurants)
 	
 	
 @app.route('/login', methods=['GET', 'POST'])
@@ -227,8 +233,13 @@ def manage_company(comp_name, comp_hash):
 			company.email = edit_comp_form.email.data
 			company.description = edit_comp_form.company_description.data
 			if edit_comp_form.cover_pic.data:
-				cover_pic_filename = photos.save(edit_comp_form.cover_pic.data)
-				company.cover_pic = photos.url(cover_pic_filename)
+				pic_query = Company.query.filter_by(cover_pic=str(edit_comp_form.cover_pic.data)).first()
+				if pic_query is None:
+					cover_pic_filename = photos.save(edit_comp_form.cover_pic.data)
+					company.cover_pic = photos.url(cover_pic_filename)
+				else:
+					flash('Duplicate cover pic name, please choose a different(specific) name for your cover pic.')
+					return redirect(url_for('manage_company', comp_hash=company.company_hash, comp_name=company.name))
 			db.session.commit()
 			return redirect(url_for('manage_company', comp_hash=company.company_hash, comp_name=company.name))
 	elif request.method == 'GET':
@@ -298,13 +309,34 @@ def manage_submenu(submenu_name, submenu_hash):
 	food_item_form = AddFoodItemForm()
 	if food_item_form.submit_food_item_form.data:
 		if food_item_form.validate_on_submit():
-			food_item = FoodItem(name=food_item_form.food_item_name.data, price=food_item_form.food_item_price.data, description=food_item_form.food_item_description.data, company_id=submenu.company_id, submenu_id=submenu.id)
-			for_hash = food_item.name + str(food_item.id) + str(submenu.company_id) + str(food_item.price)
-			food_item.set_food_item_hash(for_hash)
-			if food_item_form.food_item_pic.data:
-				food_item_pic_filename = photos.save(food_item_form.food_item_pic.data)
-				food_item.cover_pic = photos.url(food_item_pic_filename)
-			db.session.add(food_item)
+			item_query = FoodItem.query.filter_by(name=food_item_form.food_item_name.data, submenu_id=submenu.id).first()
+			if item_query is None:
+				food_item = FoodItem(name=food_item_form.food_item_name.data, price=food_item_form.food_item_price.data, description=food_item_form.food_item_description.data, company_id=submenu.company_id, submenu_id=submenu.id)
+				for_hash = food_item.name + str(food_item.id) + str(submenu.company_id) + str(food_item.price)
+				food_item.set_food_item_hash(for_hash)
+				if food_item_form.food_item_pic.data:
+					pic_query = FoodItem.query.filter_by(cover_pic=str(food_item_form.food_item_pic.data)).first()
+					if pic_query is None:
+						food_item_pic_filename = photos.save(food_item_form.food_item_pic.data)
+						food_item.cover_pic = photos.url(food_item_pic_filename)
+					else:
+						flash('Duplicate cover pic name, please choose a different(specific) name for your cover pic.')
+						return redirect(url_for('manage_submenu', submenu_name=submenu.name, submenu_hash=submenu.submenu_hash))
+				db.session.add(food_item)
+			else:
+				item_query.name = food_item_form.food_item_name.data
+				item_query.price = food_item_form.food_item_price.data
+				item_query.description = food_item_form.food_item_description.data
+				for_hash = item_query.name + str(item_query.id) + str(submenu.company_id) + str(item_query.price)
+				item_query.set_food_item_hash(for_hash)
+				if food_item_form.food_item_pic.data:
+					pic_query = FoodItem.query.filter_by(cover_pic=str(food_item_form.food_item_pic.data)).first()
+					if pic_query is None:
+						food_item_pic_filename = photos.save(food_item_form.food_item_pic.data)
+						item_query.cover_pic = photos.url(food_item_pic_filename)
+					else:
+						flash('Duplicate cover pic name, please choose a different(specific) name for your cover pic.')
+						return redirect(url_for('manage_submenu', submenu_name=submenu.name, submenu_hash=submenu.submenu_hash))
 			db.session.commit()
 			return redirect(url_for('manage_submenu', submenu_name=submenu.name, submenu_hash=submenu.submenu_hash))
 	return render_template('submenu.html', submenu=submenu, edit_submenu_form=edit_submenu_form, food_item_form=food_item_form, foods=foods)

@@ -45,7 +45,34 @@
         </button>
       </div>
       <div class="modal-body">
-        ...
+			<div id="restaurant_carousel" class="carousel slide" data-ride="carousel">
+			  <ol class="carousel-indicators" style="bottom: 80px;">
+				{% for r in restaurants %}
+				<li data-target="#restaurant_carousel" class="carousel-indicator-list" set-active="{{ r.show_order }}" data-slide-to="{{ r.show_order }}"></li>
+				{% endfor %}
+			  </ol>
+			  <div class="carousel-inner">
+				{% for r in restaurants %}
+				<div class="carousel-item" set-active="{{ r.show_order }}">
+				  <img class="d-block w-100"  src="{{ r.cover_pic}}" alt="{{ r.name }} cover pic" style="height: 300px;">
+				  <div class="text-center d-md-block">
+					<a href="{{ url_for('partner', comp_name=r.name, comp_hash=r.company_hash)}}">
+						<h5>{{ r.name }}</h5>
+						<p>{{ r.description }}</p>
+					</a>
+				  </div>
+				</div>
+				{% endfor %}
+			  </div>
+			  <a class="carousel-control-prev" href="#restaurant_carousel" role="button" data-slide="prev">
+				<span class="carousel-control-prev-icon" aria-hidden="true"></span>
+				<span class="sr-only">Previous</span>
+			  </a>
+			  <a class="carousel-control-next" href="#restaurant_carousel" role="button" data-slide="next">
+				<span class="carousel-control-next-icon" aria-hidden="true"></span>
+				<span class="sr-only">Next</span>
+			  </a>
+			</div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -114,6 +141,8 @@
 <script>
 $(document).ready(function() {
 	$("#submit_bpf").addClass("btn btn-primary");
+	$('.carousel-indicator-list[set-active=0] ').addClass("active");
+	$('.carousel-item[set-active=0]').addClass("active");
 });
 $(window).on('load',function(){
 	if ($("#bpf_container").has("form p.help-block").length !== 0){
