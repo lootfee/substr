@@ -3,6 +3,19 @@
 
 {% block app_content %}
 <div class="container">
+	<div id="cart_container">
+		<table class="table table-hover">
+			<thead class="thead-dark">
+				<th scope="col">Item</th>
+				<th scope="col">Price</th>
+				<th scope="col">Qty</th>
+			</thead>
+			<tbody>
+				
+			</tbody>
+		</table>
+		<div style="float:right;">Total: <span id="cart_total"></span></div>
+	</div>
 	<div class="row">
 		<div class="col-md-12 col-sm-12 col-12 text-center">
 			<div class="card">
@@ -12,7 +25,7 @@
 			  <div class="card-body text-center">
 				<h1 class="card-title">{{ company.name }}</h1>
 				<h5 class="card-subtitle" style="color: #b3b3b3;">{{ company.description }}</h5>
-				{% if current_user.is_company_admin(company) %}
+				{% if current_user.is_authenticated and current_user.is_company_admin(company) %}
 				<div class="text-right"><a class="card-text" href="{{url_for('manage_company', comp_name=company.name, comp_hash=company.company_hash)}}">Manage</a></div>
 				{% endif %}
 			  </div>
@@ -25,21 +38,30 @@
 			<div class="text-center">
 				<h3>Menu</h3>
 			</div>
-			<div id="accordion">
+			<div id="menu">
+			{% for menu in submenu %}
 			  <div class="card">
-				<div class="card-header text-center" id="headingOne">
-				  <h5 class="mb-0">
-					<button class="btn btn-link" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-					  Collapsible Group Item #1
-					</button>
-				  </h5>
+				<div class="card-header text-center" style="padding: 0;">
+				  <button class="btn btn-danger" id="collapse_button_{{ menu.show_order }}" type="button" style="width:100%; padding: 10px;"><h5 class="mb-0">{{ menu.name }}</h5></button>
 				</div>
-				<div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
-				  <div class="card-body">
-					Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
+				  <div class="card-body" id="collapse_body_{{ menu.show_order }}">
+					<div class="row">
+						{% for food in menu.foods %}
+							<div class="col-md-3 offset-md-0 col-sm-10 offset-sm-1 col-xs-10 offset-xs-1 add_break">
+								<div class="card" style="height:360px;">
+								  <img src="{{ food.cover_pic }}" class="card-img-top" alt="{{ food.name }}" title="{{ food.name }}" height="160px;">
+								  <div class="card-body">
+									<h5 class="card-title" style="height: 50px;">{{ food.name }} - P{{ food.price }}</h5>
+									<p class="card-text" title="{{ food.description }}" style="height: 44px; overflow-y: hidden;">{{ food.description }}</p>
+									<button id="a2c{{ food.food_item_hash }}" class="btn btn-primary">Add to cart</button>
+								  </div>
+								</div>
+							</div>
+						{% endfor %}
+					</div>
 				  </div>
-				</div>
 			  </div>
+			  {% endfor %}
 			</div>
 		</div>
 	</div>
@@ -52,14 +74,87 @@
 <style>
 #comp_cover_pic {
 	height: 350px;
+	width: 80%;
 }
+.add_break {
+	margin-top: 20px;
+}
+
+#cart_container {
+	width: 20%;
+    min-height: 200px;
+    position: fixed;
+    z-index: 5;
+    right: 0;
+    border: 1px solid gray;
+    border-radius: 4px;
+	padding: 10px;
+    background-color: #f7f7f7f0;
+}
+
 
 @media (max-width: 575.98px) { 
 	#comp_cover_pic {
 		height: 250px;
+		width: 100%;
+	}
+	#cart_container {
+		width: 60%;
+		font-size: 12px;
 	}
 	
-	}
+}
 </style>
 {% endblock %}
 
+{% block scripts %}
+{{ super() }}
+<script>
+$(document).ready(function() {
+	$('#cart_container').css('display', 'none');
+	{% for menu in submenu %}
+		$('#collapse_body_{{ menu.show_order }}').css('display', 'none');
+		$("#collapse_button_{{ menu.show_order }}").click(function() {
+			if ($('#collapse_body_{{ menu.show_order }}').css('display')== 'none'){
+				$('#collapse_body_{{ menu.show_order }}').css('display', 'block');
+			}
+			else {
+				$('#collapse_body_{{ menu.show_order }}').css('display', 'none');
+			}
+		});
+		
+		{% for food in menu.foods %}
+			
+			$('#a2c{{ food.food_item_hash }}').click(function() {
+				$('#cart_container').css('display', 'block');
+				var exists = $('.incart_row td#incart{{ food.food_item_hash }}').length;
+				if (!exists ){
+					$('#cart_container table tbody').append('<tr class="incart_row"><td id="incart{{ food.food_item_hash }}">{{ food.name }}</td> <td ><span>P</span><span id="incart_{{ food.name }}_price">{{ food.price }}</span></td> <td id="incart_{{ food.name }}_qty" contenteditable>1</td><td id="{{ food.name }}_total" class="each_total" style="display: none;"></td></tr>');
+					$('#{{ food.name }}_total').html(($('#incart_{{ food.name }}_price').html() * $("#incart_{{ food.name }}_qty").html()).toFixed(2));
+					var get_total = 0;
+					$('.each_total').each(function() {
+						get_total += parseFloat($(this).html());
+						$('#cart_total').html(parseFloat(get_total).toFixed(2));
+					});
+					
+				}
+			});
+			
+			$(document).on('keyup', '#incart_{{ food.name }}_qty', function() {
+				if ($(this).html() != 0 || $(this).html() != '' ){
+					var changed_total = 0;
+					$('#{{ food.name }}_total').html(($('#incart_{{ food.name }}_price').html() * $("#incart_{{ food.name }}_qty").html()).toFixed(2));
+					$('.each_total').each(function() {
+						changed_total += parseFloat($(this).html());
+						$('#cart_total').html(parseFloat(changed_total).toFixed(2));
+					});
+					
+				}
+				
+			});
+			
+		{% endfor %}
+	{% endfor %}
+});
+</script>
+{% endblock %}

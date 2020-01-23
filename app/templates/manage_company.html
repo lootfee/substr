@@ -74,9 +74,11 @@
 						<th scope="col">Submenus</th>
 					</thead>
 					<tbody>
+						{% for c in company.submenus %}
 						<tr>
-							<td style="font-weight: bold;">{% for c in company.submenus %}{{ c.name }} <span style="float: right;"><a href="{{ url_for('manage_submenu', submenu_name=c.name, submenu_hash=c.submenu_hash) }}">Manage Content</a></span>{% endfor %}</td>
+							<td style="font-weight: bold;">{{ c.name }} <span style="float: right;"><a href="{{ url_for('manage_submenu', submenu_name=c.name, submenu_hash=c.submenu_hash) }}">Manage Content</a></span></td>
 						</tr>
+						{% endfor %}
 					</tbody>
 				</table>
 			</div>

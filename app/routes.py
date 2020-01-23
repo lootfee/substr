@@ -213,11 +213,16 @@ def reject_request(comp_id):
 	return redirect(url_for('admin'))
 	
 	
-@app.route('/partner/<comp_name>/<comp_hash>', methods=['GET', 'POST'])
-@login_required
+@app.route('/partners/<comp_name>/<comp_hash>', methods=['GET', 'POST'])
 def partner(comp_name, comp_hash):
 	company = Company.query.filter_by(company_hash=comp_hash).first()
-	return render_template('partner.html', company=company)
+	submenu = Submenu.query.filter_by(company_id=company.id).all()
+	for menu in submenu:
+		menu.show_order = 0
+	for n in range(0, len(submenu)):
+		menu.show_order = str(n)
+		menu.hash_order = menu.submenu_hash + menu.show_order
+	return render_template('partner.html', company=company, submenu=submenu)
 	
 @app.route('/manage_company/<comp_name>/<comp_hash>', methods=['GET', 'POST'])
 @login_required
