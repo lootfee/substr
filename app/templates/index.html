@@ -54,7 +54,7 @@
 			  <div class="carousel-inner">
 				{% for r in restaurants %}
 				<div class="carousel-item" set-active="{{ r.show_order }}">
-				  <img class="d-block w-100"  src="{{ r.cover_pic}}" alt="{{ r.name }} cover pic" style="height: 300px;">
+				  <img class="d-block w-100"  src="https://images.weserv.nl/?url={{ r.cover_pic}}&h=300" alt="{{ r.name }} cover pic" style="height: 300px;">
 				  <div class="text-center d-md-block">
 					<a href="{{ url_for('partner', comp_name=r.name, comp_hash=r.company_hash)}}">
 						<h5>{{ r.name }}</h5>
