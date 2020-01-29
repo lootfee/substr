@@ -43,7 +43,7 @@
 				  <img src="https://images.weserv.nl/?url={{ food.cover_pic }}&h=160" class="card-img-top" alt="{{ food.name }}" title="{{ food.name }}" height="160px;">
 				  <div class="card-body">
 					<h5 class="card-title" style="height: 50px;">{{ food.name }} - P{{ food.price }}</h5>
-					<p class="card-text" title="{{ food.description }}" style="height: 44px; overflow-y: hidden;">{{ food.description }}</p>
+					<p class="card-text" title="{{ food.description }}" style="height: 46px; overflow-y: hidden;">{{ food.description }}</p>
 					<a href="#" class="btn btn-primary">Add to cart</a>
 				  </div>
 				</div>
@@ -87,11 +87,23 @@ $("#food_item_pic").on("change", function (e) {
 	var size = $(this)[0].files[0].size;
 	if (size > 20000) {
 		$(this).after("<p id='file_size_alert' class='alert alert-danger alert-dismissible' role='alert'>File size too large! Please change or edit image size.</p>");
-		$("#submit").css('display', 'none');
+		$("#submit_food_item_form").css('display', 'none');
 	}
 	else{
 		$("#file_size_alert").css('display', 'none');
-		$("#submit").css('display', 'block');
+		$("#submit_food_item_form").css('display', 'block');
+	}
+});
+
+$("#edit_food_item_pic").on("change", function (e) {
+	var size = $(this)[0].files[0].size;
+	if (size > 20000) {
+		$(this).after("<p id='file_size_alert' class='alert alert-danger alert-dismissible' role='alert'>File size too large! Please change or edit image size.</p>");
+		$("#submit_edit_item_form").css('display', 'none');
+	}
+	else{
+		$("#file_size_alert").css('display', 'none');
+		$("#submit_edit_item_form").css('display', 'block');
 	}
 });
 </script>
