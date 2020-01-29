@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+{% block app_content %}
+<div class="container">
+	{% if pending_orders %}
+	<div class="row">
+		<div class="col-md-8 col-sm-12 col-12">
+			<h3>Orders</h3>
+			<table class="table table-hover">
+				<thead>
+					<th>Item</th>
+					<th>Price</th>
+					<th class="text-center">Qty</th>
+					<th>Total</th>
+					<th></th>
+				</thead>
+				<tbody>
+					{% for order in pending_orders %}
+					<tr><td style="font-weight: bold;"><div>{{ order.food_item.name }}</div> <img src="https://images.weserv.nl/?url={{ order.food_item.cover_pic }}&w=80&h=50;" style="width: 80px;height: 50px;"></td><td><span>P</span><span id="price_{{order.food_item.food_item_hash}}">{{ order.food_item.price }}</span></td><td id="qty_{{order.food_item.food_item_hash}}" class="text-center" contenteditable>{{ order.quantity }}</td><td><span>P</span><span class="each_total" id="each_total_{{order.food_item.food_item_hash}}"></span></td><td style="width: 5px;"><a href="{{url_for('remove_item', id=order.id)}}"><i class="far fa-trash-alt"></i></a></td></tr>
+					{% endfor %}
+					<tr style="font-weight: bold;"><td>Grand Total</td><td></td><td></td><td><span>P</span><span id="order_total"></span></td></tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-lg-7 col-md-8 col-sm-12 col-12">
+			<form action method="post" class="form" role="form" name="checkout_form" id="checkout_form">
+				{{ checkout_form.csrf_token() }}
+				<div style="float:right;">{{ checkout_form.checkout_submit (class_="btn btn-primary")}}</div>
+			</form>
+		</div>
+	</div>
+	{% else %}
+	<div class="row">
+		<div><h1>No more pending orders.</h1></div>
+	</div>
+	{% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+$(document).ready(function() {
+	{% for order in pending_orders %}
+	
+	$('#each_total_{{order.food_item.food_item_hash}}').html( ($('#price_{{order.food_item.food_item_hash}}').html() * $('#qty_{{order.food_item.food_item_hash}}').html()).toFixed(2) ); 
+	
+	$(document).on('keyup', '#qty_{{order.food_item.food_item_hash}}', function() {
+		if ($(this).html() != 0 || $(this).html() != '' ){
+			var changed_total = 0;
+			$('#each_total_{{order.food_item.food_item_hash}}').html( ($('#price_{{order.food_item.food_item_hash}}').html() * $('#qty_{{order.food_item.food_item_hash}}').html()).toFixed(2) );
+			$('.each_total').each(function() {
+				changed_total += parseFloat($(this).html());
+				$('#order_total').html(parseFloat(changed_total).toFixed(2));
+			});
+			
+		}
+		
+	});
+	
+	var get_total = 0;
+	$('.each_total').each(function() {
+		get_total += parseFloat($(this).html());
+		$('#order_total').html(parseFloat(get_total).toFixed(2));
+	});
+	
+	$('#checkout_submit').click(function() {
+		$('#qty_{{order.food_item.food_item_hash}}').each(function() {
+			var qty_{{ order.food_item.food_item_hash }}_ = $('#qty_{{order.food_item.food_item_hash}}').html();
+			$('#checkout_form').append('<input name="order_id" value="{{ order.id }}"><input name="order_quantity" id="order_{{ order.food_item.food_item_hash }}_quantity" value="">');
+			$('#order_{{ order.food_item.food_item_hash }}_quantity').val(qty_{{ order.food_item.food_item_hash }}_)
+		});
+		
+	});
+	
+	{% endfor %}
+});
+</script>
+{% endblock %}

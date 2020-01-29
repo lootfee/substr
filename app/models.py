@@ -27,6 +27,8 @@ class User(UserMixin, db.Model):
 	password_hash = db.Column(db.String(128))
 	profile_pic = db.Column(db.String(1000))
 	last_seen = db.Column(db.DateTime, default=datetime.utcnow)
+	
+	orders = db.relationship('Orders', backref=db.backref('ordered_by', lazy=True), lazy='dynamic')
 
 	def __repr__(self):
 		return '<User {}>'.format(self.username)
@@ -51,11 +53,22 @@ class User(UserMixin, db.Model):
 			return
 		return User.query.get(id)
 		
+	def is_superadmin(self):
+		return self.id == 1
+		
 	def is_company_admin(self, company):
 		return self.admin_of.filter(admins.c.company == company.id).count() > 0
 		
 	def is_company_staff(self, company):
 		return self.staff_of.filter(staffs.c.company == company.id).count() > 0
+		
+	def is_substr_admin(self):
+		return self.admin_of.filter(admins.c.company == 1).count() > 0 or self.id == 1
+		
+	def is_substr_staff(self):
+		return self.staff_of.filter(staffs.c.company == 1).count() > 0 or self.id == 1
+		
+	
 		
 class Company(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
@@ -73,6 +86,7 @@ class Company(db.Model):
 	company_hash = db.Column(db.String(128))
 	
 	submenus = db.relationship('Submenu', backref=db.backref('submenu_of', lazy=True), lazy='dynamic')
+	orders = db.relationship('Orders', backref=db.backref('company', lazy=True), lazy='dynamic')
 	
 	admins = db.relationship(
 		'User', secondary='admins',
@@ -111,6 +125,21 @@ class FoodItem(db.Model):
 	submenu_id = db.Column(db.Integer, db.ForeignKey('submenu.id'))
 	food_item_hash = db.Column(db.String(128))
 	
+	orders = db.relationship('Orders', backref=db.backref('food_item', lazy=True), lazy='dynamic')
+	
 	def set_food_item_hash(self, name):
 		self.food_item_hash = hashlib.sha256(name.encode('utf-8')).hexdigest()
+		
+		
+class Orders(db.Model):
+	id = db.Column(db.Integer, primary_key=True)
+	food_item_hash = db.Column(db.String(128))
+	quantity = db.Column(db.String(16))
+	price = db.Column(db.Numeric(10,2))
+	date_purchased = db.Column(db.DateTime)
+	user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+	company_id = db.Column(db.Integer, db.ForeignKey('company.id'))
+	food_item_id = db.Column(db.Integer, db.ForeignKey('food_item.id'))
 	
+	def is_ordered_by(self, user):
+		return self.ordered_by == user

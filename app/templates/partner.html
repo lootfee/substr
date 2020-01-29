@@ -4,23 +4,30 @@
 {% block app_content %}
 <div class="container">
 	<div id="cart_container">
-		<table class="table table-hover">
+		<i id="cart_container_min_max" title="minimize" class="fas fa-caret-square-right"></i>
+		<table class="table table-hover" id="cart_table">
 			<thead class="thead-dark">
 				<th scope="col">Item</th>
 				<th scope="col">Price</th>
 				<th scope="col">Qty</th>
+				<th scope="col"></th>
 			</thead>
 			<tbody>
-				
+
 			</tbody>
 		</table>
 		<div style="float:right;">Total: <span id="cart_total"></span></div>
+		<form action method="post" class="form" role="form" name="orders_list_form" id="orders_list_form">
+			{{ orders_form.csrf_token() }}
+			{{ orders_form.order_submit (class_="btn btn-primary")}}
+		</form>
+		
 	</div>
 	<div class="row">
 		<div class="col-md-12 col-sm-12 col-12 text-center">
 			<div class="card">
 			  <div class="card-header">
-				<img id="comp_cover_pic" class="card-img-top img-fluid" src="{{ company.cover_pic }}" alt="{{ company.name }} cover picture">
+				<img id="comp_cover_pic" class="card-img-top img-fluid" src="https://images.weserv.nl/?url={{ company.cover_pic }}&h=350" alt="{{ company.name }} cover picture">
 			  </div>
 			  <div class="card-body text-center">
 				<h1 class="card-title">{{ company.name }}</h1>
@@ -47,9 +54,9 @@
 				  <div class="card-body" id="collapse_body_{{ menu.show_order }}">
 					<div class="row">
 						{% for food in menu.foods %}
-							<div class="col-md-3 offset-md-0 col-sm-10 offset-sm-1 col-xs-10 offset-xs-1 add_break">
+							<div class="col-xl-3 offset-xl-0 col-lg-4 offset-lg-0 col-md-5 offset-md-0 col-sm-10 offset-sm-1 col-xs-10 offset-xs-1 add_break">
 								<div class="card" style="height:360px;">
-								  <img src="{{ food.cover_pic }}" class="card-img-top" alt="{{ food.name }}" title="{{ food.name }}" height="160px;">
+								  <img src="https://images.weserv.nl/?url={{ food.cover_pic }}&h=160" class="card-img-top" alt="{{ food.name }}" title="{{ food.name }}" height="160px;">
 								  <div class="card-body">
 									<h5 class="card-title" style="height: 50px;">{{ food.name }} - P{{ food.price }}</h5>
 									<p class="card-text" title="{{ food.description }}" style="height: 44px; overflow-y: hidden;">{{ food.description }}</p>
@@ -66,6 +73,7 @@
 		</div>
 	</div>
 	
+	
 </div>
 {% endblock %}
 
@@ -81,7 +89,7 @@
 }
 
 #cart_container {
-	width: 20%;
+	width: 30%;
     min-height: 200px;
     position: fixed;
     z-index: 5;
@@ -89,9 +97,39 @@
     border: 1px solid gray;
     border-radius: 4px;
 	padding: 10px;
-    background-color: #f7f7f7f0;
+    background-color: #ffffff;
+	overflow: hidden;
 }
 
+.remove_order_btn {
+	border-radius: 4px;
+    border-style: groove;
+    font-size: 10px;
+}
+
+table tr td.remove_order_td {
+	padding-left: 0;
+    padding-right: 0;
+}
+
+#cart_container_min_max {
+	cursor: pointer;
+}
+
+
+@media (max-width: 991.98px) { 
+	#cart_container {
+		width: 40%;
+		
+	}
+}
+
+@media (max-width: 767.98px) { 
+	#cart_container {
+		width: 60%;
+		
+	}
+}
 
 @media (max-width: 575.98px) { 
 	#comp_cover_pic {
@@ -99,11 +137,12 @@
 		width: 100%;
 	}
 	#cart_container {
-		width: 60%;
+		width: 75%;
 		font-size: 12px;
 	}
 	
 }
+
 </style>
 {% endblock %}
 
@@ -116,10 +155,10 @@ $(document).ready(function() {
 		$('#collapse_body_{{ menu.show_order }}').css('display', 'none');
 		$("#collapse_button_{{ menu.show_order }}").click(function() {
 			if ($('#collapse_body_{{ menu.show_order }}').css('display')== 'none'){
-				$('#collapse_body_{{ menu.show_order }}').css('display', 'block');
+				$('#collapse_body_{{ menu.show_order }}').animate({height: 'toggle'}, 'slow');
 			}
 			else {
-				$('#collapse_body_{{ menu.show_order }}').css('display', 'none');
+				$('#collapse_body_{{ menu.show_order }}').animate({height:'toggle'}, 'slow');
 			}
 		});
 		
@@ -127,10 +166,10 @@ $(document).ready(function() {
 			
 			$('#a2c{{ food.food_item_hash }}').click(function() {
 				$('#cart_container').css('display', 'block');
-				var exists = $('.incart_row td#incart{{ food.food_item_hash }}').length;
+				var exists = $('.incart_row td#incart{{ food.food_item_hash }}_name').length;
 				if (!exists ){
-					$('#cart_container table tbody').append('<tr class="incart_row"><td id="incart{{ food.food_item_hash }}">{{ food.name }}</td> <td ><span>P</span><span id="incart_{{ food.name }}_price">{{ food.price }}</span></td> <td id="incart_{{ food.name }}_qty" contenteditable>1</td><td id="{{ food.name }}_total" class="each_total" style="display: none;"></td></tr>');
-					$('#{{ food.name }}_total').html(($('#incart_{{ food.name }}_price').html() * $("#incart_{{ food.name }}_qty").html()).toFixed(2));
+					$('#cart_container table tbody').append('<tr class="incart_row" id="incart_row_{{ food.food_item_hash }}"><td id="incart{{ food.food_item_hash }}_name">{{ food.name }}</td> <td ><span>P</span><span id="incart_{{ food.food_item_hash }}_price">{{ food.price }}</span></td> <td id="incart_{{ food.food_item_hash }}_qty" contenteditable>1</td><td id="{{ food.food_item_hash }}_total" class="each_total" style="display: none;"></td><td class="remove_order_td"><button type="button" class="remove_item_btn" style="border-style: hidden;background-color: #f5b2b2eb;"><i class="fas fa-trash"></i></button></td></tr>');
+					$('#{{ food.food_item_hash }}_total').html(($('#incart_{{ food.food_item_hash }}_price').html() * $("#incart_{{ food.food_item_hash }}_qty").html()).toFixed(2));
 					var get_total = 0;
 					$('.each_total').each(function() {
 						get_total += parseFloat($(this).html());
@@ -140,10 +179,10 @@ $(document).ready(function() {
 				}
 			});
 			
-			$(document).on('keyup', '#incart_{{ food.name }}_qty', function() {
+			$(document).on('keyup', '#incart_{{ food.food_item_hash }}_qty', function() {
 				if ($(this).html() != 0 || $(this).html() != '' ){
 					var changed_total = 0;
-					$('#{{ food.name }}_total').html(($('#incart_{{ food.name }}_price').html() * $("#incart_{{ food.name }}_qty").html()).toFixed(2));
+					$('#{{ food.food_item_hash }}_total').html(($('#incart_{{ food.food_item_hash }}_price').html() * $("#incart_{{ food.food_item_hash }}_qty").html()).toFixed(2));
 					$('.each_total').each(function() {
 						changed_total += parseFloat($(this).html());
 						$('#cart_total').html(parseFloat(changed_total).toFixed(2));
@@ -153,8 +192,45 @@ $(document).ready(function() {
 				
 			});
 			
+			$('#order_submit').click(function() {
+				$('#incart_{{ food.food_item_hash }}_qty').each(function() {
+					var qty_{{ food.food_item_hash }}_ = $('#incart_{{ food.food_item_hash }}_qty').html();
+					$('#orders_list_form').append('<input type="hidden" name="order_food_id" value="{{ food.id }}"><input type="hidden" name="order_food_hash" value="{{ food.food_item_hash }}"><input type="hidden" name="order_quantity" id="order_{{ food.food_item_hash }}_quantity" value="">')
+					$('#order_{{ food.food_item_hash }}_quantity').val(qty_{{ food.food_item_hash }}_)
+				});
+			});
+			
+			
+				$('#cart_table').on('click', '.remove_item_btn', function() {
+					 $(this).closest('tr').remove();
+				});
+				
+				//$('#cart_container table tbody').remove($('#incart_row_{{ food.food_item_hash }}'));
+			
 		{% endfor %}
 	{% endfor %}
+	
+	def_width =  $('#cart_container').width();
+	$("#cart_container_min_max").click(function() {
+		if ($('#cart_container').width() > 10){
+			$('#cart_container table').css('visibility', 'collapse');
+			$('#cart_container div').css('visibility', 'collapse');
+			$('#cart_container').animate({width:'2%'});
+			$(this).addClass('fa-rotate-180');
+			$(this).prop('title', 'maximize');
+			
+		}
+		else {
+			$('#cart_container').animate({width: def_width});
+			$(this).removeClass('fa-rotate-180');
+			$(this).prop('title', 'minimize');
+			$('#cart_container table').css('visibility', 'visible');
+			$('#cart_container div').css('visibility', 'visible');
+		}
+		
+	});
+	
+	
 });
 </script>
 {% endblock %}

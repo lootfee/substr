@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from app import app, photos
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField, SelectField, IntegerField, FloatField
-from wtforms.validators import DataRequired, ValidationError, Email, EqualTo, Length
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField, SelectField, IntegerField, FloatField, HiddenField
+from wtforms.validators import DataRequired, ValidationError, Email, EqualTo, Length, InputRequired
 from app.models import User, Company
 from flask_wtf.file import FileField, FileRequired, FileAllowed
 
@@ -122,3 +122,21 @@ class AddFoodItemForm(FlaskForm):
 	food_item_description = TextAreaField('Description', validators=[DataRequired(), Length(max=100)])
 	food_item_pic = FileField('Picture (20 kB max size):', validators=[FileAllowed(photos)])
 	submit_food_item_form = SubmitField('Submit')
+	
+class EditFoodItemForm(FlaskForm):
+	edit_food_item_name = SelectField('Name', coerce=int, validators=[InputRequired()])
+	edit_item_description = TextAreaField('Description', validators=[DataRequired()])
+	edit_food_item_pic = FileField('Picture (20 kB max size):', validators=[FileAllowed(photos)])
+	submit_edit_item_form = SubmitField('Submit')
+	
+	
+class OrderListForm(FlaskForm):
+	order_food_id = HiddenField('food_item_id')
+	order_food_hash = HiddenField('food_item_hash')
+	order_quantity = HiddenField('qty')
+	order_submit = SubmitField('Checkout')
+	
+class OrderCheckoutForm(FlaskForm):
+	order_id = HiddenField('order_id')
+	order_quantity = HiddenField('qty')
+	checkout_submit = SubmitField('Checkout')
