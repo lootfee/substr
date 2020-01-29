@@ -344,6 +344,9 @@ def manage_submenu(submenu_name, submenu_hash):
 			submenu.description = edit_submenu_form.submenu_description.data,
 			db.session.commit()
 			return redirect(url_for('manage_submenu', submenu_name=submenu.name, submenu_hash=submenu.submenu_hash))
+	else if method == 'GET':
+		edit_submenu_form.input_submenu.data = submenu.name
+		edit_submenu_form.submenu_description.data = submenu.description
 	food_item_form = AddFoodItemForm()
 	if food_item_form.submit_food_item_form.data:
 		if food_item_form.validate_on_submit():
