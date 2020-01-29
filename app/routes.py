@@ -43,7 +43,6 @@ def index():
 		r.show_order = 0
 	for n in range(0, len(restaurants)):
 		r.show_order = n
-		print(r.show_order)
 	become_partner_form = BecomePartnerForm()
 	if become_partner_form.validate_on_submit():
 		company = Company(name=become_partner_form.business_name.data, business_type=become_partner_form.business_type.data, address=become_partner_form.business_address.data, contact=become_partner_form.contact_info.data, email=become_partner_form.email.data)
@@ -344,7 +343,7 @@ def manage_submenu(submenu_name, submenu_hash):
 			submenu.description = edit_submenu_form.submenu_description.data,
 			db.session.commit()
 			return redirect(url_for('manage_submenu', submenu_name=submenu.name, submenu_hash=submenu.submenu_hash))
-	elif method == 'GET':
+	elif request.method == 'GET':
 		edit_submenu_form.input_submenu.data = submenu.name
 		edit_submenu_form.submenu_description.data = submenu.description
 	food_item_form = AddFoodItemForm()
