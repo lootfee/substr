@@ -57,10 +57,10 @@ class User(UserMixin, db.Model):
 		return self.id == 1
 		
 	def is_company_admin(self, company):
-		return self.admin_of.filter(admins.c.company == company.id).count() > 0
+		return self.admin_of.filter(admins.c.company == company.id).count() > 0 or self.id == 1
 		
 	def is_company_staff(self, company):
-		return self.staff_of.filter(staffs.c.company == company.id).count() > 0
+		return self.staff_of.filter(staffs.c.company == company.id).count() > 0 or self.id == 1
 		
 	def is_substr_admin(self):
 		return self.admin_of.filter(admins.c.company == 1).count() > 0 or self.id == 1
