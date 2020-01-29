@@ -17,7 +17,7 @@
 
 		  <div class="collapse navbar-collapse" id="navbarContent">
 			<ul class="navbar-nav mr-auto">
-				{% if current_user.is_substr_admin() %}
+				{% if current_user.is_authenticated and current_user.is_substr_admin() %}
 				<li class="nav-item">
 					<a class="nav-link" href="{{ url_for('admin') }}">Admin</a>
 				</li>

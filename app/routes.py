@@ -189,8 +189,9 @@ def user():
 @app.route('/admin', methods=['GET', 'POST'])
 @login_required
 def admin():
-	if not current_user.is_substr_admin():
-		return redirect(url_for('index'))
+	if current_user.is_authenticated:
+		if not current_user.is_substr_admin():
+			return redirect(url_for('index'))
 	pending_requests = Company.query.filter(Company.date_requested.isnot(None)).filter_by(date_approved=None).all()
 	partners = Company.query.filter(Company.date_approved.isnot(None)).all()
 	return render_template('admin.html', pending_requests=pending_requests, partners=partners)
@@ -199,8 +200,9 @@ def admin():
 @app.route('/approve_request/<comp_id>')
 @login_required
 def approve_request(comp_id):
-	if not current_user.is_substr_admin():
-		return redirect(url_for('index'))
+	if current_user.is_authenticated:
+		if not current_user.is_substr_admin():
+			return redirect(url_for('index'))
 	approved_company = Company.query.filter_by(id=comp_id).first()
 	approved_company.date_approved = datetime.utcnow()
 	for_hash = approved_company.name + approved_company.date_approved.strftime("%m%d%Y%H%M%S")
@@ -211,8 +213,9 @@ def approve_request(comp_id):
 @app.route('/reject_request/<comp_id>')
 @login_required
 def reject_request(comp_id):
-	if not current_user.is_substr_admin():
-		return redirect(url_for('index'))
+	if current_user.is_authenticated:
+		if not current_user.is_substr_admin():
+			return redirect(url_for('index'))
 	company = Company.query.get(comp_id)
 	db.session.delete(company)
 	db.session.commit()
@@ -244,8 +247,9 @@ def partner(comp_name, comp_hash):
 @login_required
 def manage_company(comp_name, comp_hash):
 	company = Company.query.filter_by(company_hash=comp_hash).first()
-	if not current_user.is_company_admin(company):
-		return redirect(url_for('index'))
+	if current_user.is_authenticated:
+		if not current_user.is_company_admin(company):
+			return redirect(url_for('index'))
 	edit_comp_form = EditCompanyForm(company.email)
 	if edit_comp_form.submit_ecf.data:
 		if edit_comp_form.validate_on_submit():
@@ -303,8 +307,9 @@ def manage_company(comp_name, comp_hash):
 @login_required
 def remove_admin(comp_hash, admin_id):
 	company = Company.query.filter_by(company_hash=comp_hash).first()
-	if not current_user.is_company_admin(company):
-		return redirect(url_for('index'))
+	if current_user.is_authenticated:
+		if not current_user.is_company_admin(company):
+			return redirect(url_for('index'))
 	user = User.query.filter_by(id=admin_id).first()
 	company.admins.remove(user)
 	return redirect(url_for('manage_company', comp_hash=company.company_hash, comp_name=company.name))
@@ -314,8 +319,9 @@ def remove_admin(comp_hash, admin_id):
 @login_required
 def remove_staff(comp_hash, staff_id):
 	company = Company.query.filter_by(company_hash=comp_hash).first()
-	if not current_user.is_company_admin(company):
-		return redirect(url_for('index'))
+	if current_user.is_authenticated:
+		if not current_user.is_company_admin(company):
+			return redirect(url_for('index'))
 	user = User.query.filter_by(id=staff_id).first()
 	company.staffs.remove(user)
 	return redirect(url_for('manage_company', comp_hash=company.company_hash, comp_name=company.name))
@@ -328,8 +334,9 @@ def manage_submenu(submenu_name, submenu_hash):
 	submenu = Submenu.query.filter_by(submenu_hash=submenu_hash).first()
 	foods = FoodItem.query.filter_by(submenu_id=submenu.id).order_by(FoodItem.name.asc()).all()
 	company = Company.query.filter_by(id=submenu.company_id).first()
-	if not current_user.is_company_admin(company):
-		return redirect(url_for('index'))
+	if current_user.is_authenticated:
+		if not current_user.is_company_admin(company):
+			return redirect(url_for('index'))
 	edit_submenu_form = AddSubMenuForm()
 	if edit_submenu_form.submit_submenu_form.data:
 		if edit_submenu_form.validate_on_submit():
@@ -396,8 +403,9 @@ def checkout(username):
 @login_required
 def remove_item():
 	item = Order.query.filter_by(id=id).first()
-	if not item.is_ordered_by(current_user):
-		return redirect(url_for('index'))
+	if current_user.is_authenticated:
+		if not item.is_ordered_by(current_user):
+			return redirect(url_for('index'))
 	db.session.delete(item)
 	db.session.commit()
 	return redirect(url_for('checkout', username=current_user.username))
