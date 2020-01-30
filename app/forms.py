@@ -71,7 +71,7 @@ class BecomePartnerForm(FlaskForm):
 	business_address = StringField('Business address', validators=[DataRequired()])
 	email = StringField('Email', validators=[DataRequired(), Email()])
 	contact_info = StringField('Contact number', validators=[DataRequired()], default="+639")
-	message = TextAreaField('Message', validators=[DataRequired()])
+	message = TextAreaField('Business details', validators=[DataRequired()])
 	submit_bpf = SubmitField('Submit')
 	
 	def validate_email(self, email):
