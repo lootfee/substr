@@ -79,6 +79,24 @@ def login():
     return render_template('login.html', title='Sign In', form=form)
 
 
+@app.route('/login/<login_hash>', methods=['GET', 'POST'])
+def accepted_login():
+	if current_user.is_authenticated:
+		return redirect(url_for('index'))
+	company = Company.query.filter_by(company_hash=login_hash).first()
+	form = LoginForm()
+	if form.validate_on_submit():
+		user = User.query.filter_by(username=form.username.data).first()
+		if user is None or not user.check_password(form.password.data):
+			flash('Invalid username or password')
+			return redirect(url_for('login'))
+		login_user(user, remember=form.remember_me.data)
+		company.admins.append(user)
+		company.staffs.append(user)
+		db.session.commit()
+		return redirect(url_for('manage_company', comp_name=company.name, comp_hash=company.company_hash) )
+	return render_template('login.html', title='Sign In', form=form)
+
 
 @app.route('/authorize/<provider>')
 def oauth_authorize(provider):
@@ -207,6 +225,15 @@ def approve_request(comp_id):
 	for_hash = approved_company.name + approved_company.date_approved.strftime("%m%d%Y%H%M%S")
 	approved_company.set_company_hash(for_hash)
 	db.session.commit()
+	msg = Message("Welcome to Substr", sender=app.config['MAIL_USERNAME'], recipients=[approved_company.email])
+	msg.html = "<h4>Congratualtions!!! " + approved_company.name + "'s request to be a substr partner has been approved.</h4><p>Please register as a user <a href=" + url_for('register') + " target='_blank'>here</a> if you don't have an account yet and login using <a href=" + url_for('accepted_login', login_hash=approved_company.company_hash) + " target='_blank'>this link</a></p><p> Please note that you cannot use the facebook login here.</p>"
+	mail.send(msg)
+	try:
+		mail.send(msg)
+	except smtplib.SMTPRecipientsRefused:
+		return redirect(url_for('admin'))
+	except smtplib.SMTPRecipientsRefused:
+		return redirect(url_for('admin'))
 	return redirect(url_for('admin'))
 	
 @app.route('/reject_request/<comp_id>')
@@ -222,6 +249,7 @@ def reject_request(comp_id):
 	
 	
 @app.route('/partners/<comp_name>/<comp_hash>', methods=['GET', 'POST'])
+@login_required
 def partner(comp_name, comp_hash):
 	company = Company.query.filter_by(company_hash=comp_hash).first()
 	submenu = Submenu.query.filter_by(company_id=company.id).all()
@@ -385,6 +413,8 @@ def manage_submenu(submenu_name, submenu_hash):
 @app.route('/checkout/<username>', methods=['GET', 'POST'])
 @login_required
 def checkout(username):
+	if current_user.is_anonymous:
+		return redirect(url_for('login'))
 	pending_orders = Orders.query.filter_by(user_id=current_user.id, date_purchased=None).all()
 	checkout_form = OrderCheckoutForm()
 	if checkout_form.validate_on_submit():

@@ -70,7 +70,7 @@ $(document).ready(function() {
 	$('#checkout_submit').click(function() {
 		$('#qty_{{order.food_item.food_item_hash}}').each(function() {
 			var qty_{{ order.food_item.food_item_hash }}_ = $('#qty_{{order.food_item.food_item_hash}}').html();
-			$('#checkout_form').append('<input name="order_id" value="{{ order.id }}"><input name="order_quantity" id="order_{{ order.food_item.food_item_hash }}_quantity" value="">');
+			$('#checkout_form').append('<input type="hidden" name="order_id" value="{{ order.id }}"><input type="hidden" name="order_quantity" id="order_{{ order.food_item.food_item_hash }}_quantity" value="">');
 			$('#order_{{ order.food_item.food_item_hash }}_quantity').val(qty_{{ order.food_item.food_item_hash }}_)
 		});
 		

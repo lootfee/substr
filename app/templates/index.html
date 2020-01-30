@@ -25,15 +25,52 @@
 					
 					<div class="col-sm-6 col-6"><button class="btn btn-primary" data-toggle="modal" data-target="#create_order_modal">Create Order</button></div>
 	
-					<div class="col-sm-6 col-6"><button class="btn btn-primary" data-toggle="modal" data-target="#become_partner_modal">Be a partner</button></div>
+					<div class="col-sm-6 col-6"><button class="btn btn-primary" data-toggle="modal" data-target="#task_request_modal">Task request</button></div>
 				</div>
+				
 				
 			</div>
 			<div class="col-sm-3 col-1">
 			</div>
 		</div>
 	</div>
-  
+	
+	<div id="partners_div" class="container-fluid text-center">
+			<div class="row" id="partners_row">
+				<div class="col-md-12 col-sm-12 col-12"><h2>Want to be part of our team?</h2></div>
+				<div class="col-lg-6 col-md-6 col-sm-12 col-12">
+					<div class="card add_break">
+					  <div class="card-body">
+						<h5 class="card-title">Partner as a Substr</h5>
+						<img src="https://res.cloudinary.com/substr/image/upload/v1551694966/Susbtr.png" style="width:130px; margin: 20px;">
+						<br>
+						<h6 class="card-subtitle mb-2 text-muted">
+							<p>Are you a rider who wants to earn extra cash on your free time?</p>
+							<p>Or are you a person who wants to help fellow Ilonggos?</p>
+							<p>Join us and we will help our fellow Ilonggos.</p>
+						</h6>
+						<button class="btn btn-primary" data-toggle="modal" data-target="#apply_driver_modal">Apply as substr driver</button>
+					  </div>
+					</div>
+				</div>
+				<div class="col-lg-6 col-md-6 col-sm-12 col-12">
+					<div class="card add_break">
+					  <div class="card-body">
+						<h5 class="card-title">Partner as a Business</h5>
+						<img src="https://res.cloudinary.com/substr/image/upload/v1551694965/Business.png" style="width:130px; margin: 20px;">
+						<br>
+						<h6 class="card-subtitle mb-2 text-muted">
+							<p>Are you a business that wants to accommodate online orders?</p>
+							<p>Or a business that is looking for a much cheaper delivery service?</p>
+							<p>Join us and we will handle all these problems for you!</p>
+						</h6>
+						<button class="btn btn-primary" data-toggle="modal" data-target="#become_partner_modal">Be a substr partner</button>
+					  </div>
+					</div>
+				</div>
+				
+			</div>
+		</div>
  <!-- Modal --> 
 <div class="modal fade" id="create_order_modal" tabindex="-1" role="dialog" aria-labelledby="create_order_modal_Label" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" role="document">
@@ -127,11 +164,28 @@
     border-radius: 3px;
 }
 
+.add_break {
+	margin-top: 20px;
+}
+
+#partners_div {
+	background-color: #cfdffd;
+    padding: 5px;
+    margin-top: 40px;
+}
+
+#partners_row {
+	margin: 60px;
+}
+
 @media (max-width: 576px) { 
 	#index-heading {
 		font-size: 14px;
 	}
-
+	
+	#partners_row {
+		margin: 20px;
+	}
 }
 </style>
 {% endblock %}
