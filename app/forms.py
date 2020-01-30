@@ -12,22 +12,23 @@ class LoginForm(FlaskForm):
     submit_login = SubmitField('Sign In')
 	
 class RegistrationForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired(), Length(min=4, max=15)])
-    email = StringField('Email', validators=[DataRequired(), Email()])
-    password = PasswordField('Password', validators=[DataRequired()])
-    password2 = PasswordField(
-        'Repeat Password', validators=[DataRequired(), EqualTo('password')])
-    submit = SubmitField('Register')
+	username = StringField('Username', validators=[DataRequired(), Length(min=4, max=15)])
+	email = StringField('Email', validators=[DataRequired(), Email()])
+	contact_info = StringField('Contact number', validators=[DataRequired()], default="+639")
+	password = PasswordField('Password', validators=[DataRequired()])
+	password2 = PasswordField(
+		'Repeat Password', validators=[DataRequired(), EqualTo('password')])
+	submit = SubmitField('Register')
 
-    def validate_username(self, username):
-        user = User.query.filter_by(username=username.data).first()
-        if user is not None:
-            raise ValidationError('Please use a different username.')
+	def validate_username(self, username):
+		user = User.query.filter_by(username=username.data).first()
+		if user is not None:
+			raise ValidationError('Please use a different username.')
 
-    def validate_email(self, email):
-        user = User.query.filter_by(email=email.data).first()
-        if user is not None:
-            raise ValidationError('Please use a different email address.')
+	def validate_email(self, email):
+		user = User.query.filter_by(email=email.data).first()
+		if user is not None:
+			raise ValidationError('Please use a different email address.')
 			
 class EditProfileForm(FlaskForm):
 	username = StringField('Username', validators=[DataRequired()])
@@ -69,7 +70,7 @@ class BecomePartnerForm(FlaskForm):
 	business_type = SelectField('Business type', choices=[('Restaurant', 'Restaurant'), ('Retailer', 'Retailer')])
 	business_address = StringField('Business address', validators=[DataRequired()])
 	email = StringField('Email', validators=[DataRequired(), Email()])
-	contact_info = StringField('Contact number', validators=[DataRequired()])
+	contact_info = StringField('Contact number', validators=[DataRequired()], default="+639")
 	message = TextAreaField('Message', validators=[DataRequired()])
 	submit_bpf = SubmitField('Submit')
 	
