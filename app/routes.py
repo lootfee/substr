@@ -225,7 +225,8 @@ def approve_request(comp_id):
 	for_hash = approved_company.name + approved_company.date_approved.strftime("%m%d%Y%H%M%S")
 	approved_company.set_company_hash(for_hash)
 	db.session.commit()
-	msg = Message("Welcome to Substr", sender=app.config['MAIL_USERNAME'], recipients=[approved_company.email])
+	send_approve_partner_email(approved_company)
+	'''msg = Message("Welcome to Substr", sender=app.config['MAIL_USERNAME'], recipients=[approved_company.email])
 	msg.html = "<h4>Congratualtions!!! " + approved_company.name + "'s request to be a substr partner has been approved.</h4><p>Please register as a user <a href=" + url_for('register') + " target='_blank'>here</a> if you don't have an account yet and login using <a href=" + url_for('accepted_login', login_hash=approved_company.company_hash) + " target='_blank'>this link</a></p><p> Please note that you cannot use the facebook login here.</p>"
 	mail.send(msg)
 	try:
@@ -233,7 +234,7 @@ def approve_request(comp_id):
 	except smtplib.SMTPRecipientsRefused:
 		return redirect(url_for('admin'))
 	except smtplib.SMTPRecipientsRefused:
-		return redirect(url_for('admin'))
+		return redirect(url_for('admin'))'''
 	return redirect(url_for('admin'))
 	
 @app.route('/reject_request/<comp_id>')

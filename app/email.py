@@ -17,3 +17,11 @@ def send_password_reset_email(user):
                                          user=user, token=token),
                html_body=render_template('email/reset_password.html',
                                          user=user, token=token))
+										 
+										 
+
+def send_approve_partner_email(company):
+	send_email("Welcome to Substr",
+	sender=app.config['ADMINS'][0],
+	recipients=[company.email],
+	html_body=render template('email/approve_partner.html', company=company))
