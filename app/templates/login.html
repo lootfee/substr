@@ -3,26 +3,19 @@
 
 {% block app_content %}
 <div class="container">
-	<div class="row">
-		<div class="col-xl-5 col-lg-5 col-md-5 col-sm-10 col-10">
-			<h1>Sign In</h1>
-			{{ wtf.quick_form(form)}}
-			
-			<br>
-			<div>
-			 <p><a href="{{ url_for('oauth_authorize', provider='facebook') }}"><button class="btn btn-primary" type="button" style="padding: 4px; border-radius: 4px;"><img src="https://res.cloudinary.com/substr/image/upload/v1549692064/facebook.png" width="20px;"> Login with Facebook</button></a></p>
-			<p>
-				<a href="{{ url_for('register') }}">Not yet registered? Sign up</a>
-			</p>
-			<p>
-				<a href="{{ url_for('reset_password_request') }}">Forgot Your Password?</a>
-			</p>
-			</div>
-		</div>
-	
-		<div class="col-xl-5 offset-xl-1 col-lg-5 offset-lg-1 col-md-5 offset-md-1 col-sm-10 col-10">
-			<img id="substr_rider_icon" src="https://res.cloudinary.com/substr/image/upload/v1549556532/Substr-512.png" alt="substr rider icon" title="substr rider icon">
-		</div>
+	<div class="col-md-5 col-sm-10 col-10">
+    <h1>Sign In</h1>
+	{{ wtf.quick_form(form)}}
+	</div>
+	<br>
+    <div>
+	 <p><a href="{{ url_for('oauth_authorize', provider='facebook') }}"><button class="btn btn-primary" type="button" style="padding: 4px; border-radius: 4px;"><img src="https://res.cloudinary.com/substr/image/upload/v1549692064/facebook.png" width="20px;"> Login with Facebook</button></a></p>
+	<p>
+		<a href="{{ url_for('register') }}">Not yet registered? Sign up</a>
+	</p>
+	<p>
+		<a href="{{ url_for('reset_password_request') }}">Forgot Your Password?</a>
+	</p>
 	</div>
 </div>
 {% endblock %}

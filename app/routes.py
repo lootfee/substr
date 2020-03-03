@@ -2,10 +2,10 @@ from flask import render_template, flash, redirect, url_for, request, jsonify
 from app import app, db, mail, photos
 from flask_login import current_user, login_user, login_required, logout_user
 from app.models import User, Company, Submenu, FoodItem, Orders
-from app.forms import LoginForm, RegistrationForm, EditProfileForm, ResetPasswordRequestForm, ResetPasswordForm, BecomePartnerForm, EditCompanyForm, AddAdminForm, AddStaffForm, AddSubMenuForm, AddFoodItemForm, EditFoodItemForm, OrderListForm, OrderCheckoutForm, TaskRequestForm
+from app.forms import LoginForm, RegistrationForm, EditProfileForm, ResetPasswordRequestForm, ResetPasswordForm, BecomePartnerForm, EditCompanyForm, AddAdminForm, AddStaffForm, AddSubMenuForm, AddFoodItemForm, EditFoodItemForm, OrderListForm, OrderCheckoutForm
 from werkzeug.urls import url_parse
 from datetime import datetime
-from app.email import send_password_reset_email, send_approve_partner_email
+from app.email import send_password_reset_email
 from oauth import OAuthSignIn
 from flask_mail import Message
 import json
@@ -18,13 +18,6 @@ from sqlalchemy.orm import class_mapper
   columns = [c.key for c in class_mapper(model.__class__).columns]
   # then we return their values in a dict
   return dict((c, getattr(model, c)) for c in columns)'''
-  
-@app.before_request
-def before_request():
-    if current_user.is_authenticated:
-        current_user.last_seen = datetime.utcnow()
-        db.session.commit()
-
 
 @app.route('/api/v1/users/all', methods=['GET', 'POST'])
 def users_api():
@@ -35,6 +28,12 @@ def users_api():
 		user_list.append(user_dict)
 	return jsonify(user_list)
 	
+
+@app.before_request
+def before_request():
+    if current_user.is_authenticated:
+        current_user.last_seen = datetime.utcnow()
+        db.session.commit()
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
@@ -51,7 +50,7 @@ def index():
 		db.session.commit()
 		msg = Message("Substr Partner Request", sender=app.config['MAIL_USERNAME'], recipients=["substr@labapp.tech"])
 		msg.html = "<h5>" + become_partner_form.business_name.data  + " is inquiring to be a partner.</h5><p>Business address: " +  become_partner_form.business_address.data  + "</p><p>Email: " +  become_partner_form.email.data + "</p><p>Contact: " +  become_partner_form.contact_info.data  + "</p><p>Message: " + become_partner_form.message.data + "</p>"
-		#mail.send(msg)
+		mail.send(msg)
 		try:
 			mail.send(msg)
 		except smtplib.SMTPRecipientsRefused:
@@ -59,8 +58,7 @@ def index():
 		except smtplib.SMTPRecipientsRefused:
 			return redirect(url_for('index'))
 		return redirect(url_for('index'))
-	task_request_form = TaskRequestForm()
-	return render_template('index.html', become_partner_form=become_partner_form, restaurants=restaurants, task_request_form=task_request_form)
+	return render_template('index.html', become_partner_form=become_partner_form, restaurants=restaurants)
 	
 	
 @app.route('/login', methods=['GET', 'POST'])
@@ -69,7 +67,7 @@ def login():
         return redirect(url_for('index'))
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first()
+        user = User.query.filter_by(username=form.username.data).first()
         if user is None or not user.check_password(form.password.data):
             flash('Invalid username or password')
             return redirect(url_for('login'))
@@ -88,7 +86,7 @@ def accepted_login():
 	company = Company.query.filter_by(company_hash=login_hash).first()
 	form = LoginForm()
 	if form.validate_on_submit():
-		user = User.query.filter_by(email=form.email.data).first()
+		user = User.query.filter_by(username=form.username.data).first()
 		if user is None or not user.check_password(form.password.data):
 			flash('Invalid username or password')
 			return redirect(url_for('login'))
@@ -143,7 +141,7 @@ def register():
         return redirect(url_for('index'))
     form = RegistrationForm()
     if form.validate_on_submit():
-        user = User(username=form.username.data, email=form.email.data, address=form.address.data, birthday=form.birthday.data)
+        user = User(username=form.username.data, email=form.email.data)
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
@@ -228,7 +226,6 @@ def approve_request(comp_id):
 	approved_company.set_company_hash(for_hash)
 	db.session.commit()
 	send_approve_partner_email(approved_company)
-	flash("An acceptance email has been sent to " +  approved_company.name + "'s email.")
 	'''msg = Message("Welcome to Substr", sender=app.config['MAIL_USERNAME'], recipients=[approved_company.email])
 	msg.html = "<h4>Congratualtions!!! " + approved_company.name + "'s request to be a substr partner has been approved.</h4><p>Please register as a user <a href=" + url_for('register') + " target='_blank'>here</a> if you don't have an account yet and login using <a href=" + url_for('accepted_login', login_hash=approved_company.company_hash) + " target='_blank'>this link</a></p><p> Please note that you cannot use the facebook login here.</p>"
 	mail.send(msg)

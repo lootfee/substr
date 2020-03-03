@@ -1,13 +1,16 @@
 
 <body>
 <h3>Congratulations {{ company.name }}!!!</h3>
-<img alt="Substr rider" src="https://res.cloudinary.com/substr/image/upload/v1549556532/Substr-512.png" style="">
 <h4>{{ company.name }}'s request to be a <img alt="Substr logo" src="https://res.cloudinary.com/substr/image/upload/v1549541706/Susbtr_text.png" style="width: 50px;"> partner has been approved.</h4>
-<h4>Please register as a user <a href="{{url_for('register',  _external=True)}}" target='_blank'>here</a> if you don't have an account yet and login using <a href="{{ url_for('accepted_login', login_hash=company.company_hash,  _external=True) }}" target='_blank'>this link</a>.</h4>
+<h4>Please register as a user <a href="{{url_for('register')}}" target='_blank'>here</a> if you don't have an account yet and login using <a href="{{ url_for('accepted_login', login_hash=company.company_hash) }}">this link</a>.</h4>
 
 <h5>Please not that you should login/register using a Substr created account and not from a linked Facebook account.</h5>
-<br>
-<p>We are really excited to welcome you onboard!!!</p>
-<div>All the best,</div>
-<div>Your friends at <img alt="Substr logo" src="https://res.cloudinary.com/substr/image/upload/v1549541706/Susbtr_text.png" style="width: 50px;"></div>
 </body>
+<style>
+	body {
+		background-image: url('https://res.cloudinary.com/substr/image/upload/v1549556532/Substr-512.png');
+		background-repeat: no-repeat;
+		/*background-attachment: fixed;*/
+		background-position: center top;
+	}  
+</style>
