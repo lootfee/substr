@@ -21,11 +21,11 @@
 				<div class="row">
 					<img id="substr_rider_icon" src="https://res.cloudinary.com/substr/image/upload/v1549556532/Substr-512.png" alt="substr rider icon" title="substr rider icon">
 				</div>
+				<br>
 				<div class="row">
-					
-					<div class="col-sm-6 col-6"><button class="btn btn-primary" data-toggle="modal" data-target="#create_order_modal">Create Order</button></div>
-	
-					<div class="col-sm-6 col-6"><button class="btn btn-primary" data-toggle="modal" data-target="#task_request_modal">Task request</button></div>
+					<div class="col-sm-4 col-4"><button class="btn btn-primary" data-toggle="modal" data-target="#food_order_modal">Order Food</button></div>
+					<div class="col-sm-4 col-4"><button class="btn btn-primary" data-toggle="modal" data-target="#item_order_modal">Order Items</button></div>
+					<div class="col-sm-4 col-4"><button class="btn btn-primary" data-toggle="modal" data-target="#task_request_modal">Task request</button></div>
 				</div>
 				
 				
@@ -72,7 +72,7 @@
 			</div>
 		</div>
  <!-- Modal --> 
-<div class="modal fade" id="create_order_modal" tabindex="-1" role="dialog" aria-labelledby="create_order_modal_Label" aria-hidden="true">
+<div class="modal fade" id="food_order_modal" tabindex="-1" role="dialog" aria-labelledby="food_order_modal_Label" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -113,6 +113,49 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="task_request_modal" tabindex="-1" role="dialog" aria-labelledby="task_request_modal_Label" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+		<div class="col-md-12 col-sm-12 col-12 modal-title text-center">
+			<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+			  <span aria-hidden="true">&times;</span>
+			</button>
+			<h4>Services</h4>
+		</div>
+        
+      </div>
+      <div class="modal-body">
+        <div class="row text-center">
+			<div class="col-md-4 col-sm-4 col-4">
+				<a href="{{url_for('index')}}">
+					<h5>Purchase</h5>
+					<img class="task_request_modal_img" src="https://res.cloudinary.com/substr/image/upload/v1551694966/Purchase.png" alt="purchase logo" width="100px;">
+					<div class="task_req_desc">We will purchase for you an item or two from the store and deliver them to you.</div>
+				</a>
+			</div>
+			<div class="col-md-4 col-sm-4 col-4">
+				<a href="{{url_for('index')}}">
+					<h5>Pickup</h5>
+					<img class="task_request_modal_img" src="https://res.cloudinary.com/substr/image/upload/v1551694966/Pickup.png" alt="pickup logo" width="100px;">
+					<div class="task_req_desc">We will pick-up or deliver an item for you so you can use your time on things that matter more.</div>
+				</a>
+			</div>
+			<div class="col-md-4 col-sm-4 col-4">
+				<a href="{{url_for('index')}}">
+					<h5>Proxy</h5>
+					<img class="task_request_modal_img" src="https://res.cloudinary.com/substr/image/upload/v1551694965/Proxy.png" alt="proxy logo" width="100px;">
+					<div class="task_req_desc">Skip the long, boring queues. We'll do the falling-in-line for you.</div>
+				</a>
+			</div>
+		</div>
+      </div>
+      <div class="modal-footer">
       </div>
     </div>
   </div>
@@ -179,6 +222,11 @@
 	margin: 60px;
 }
 
+.task_req_desc {
+	color: darkblue;
+    font-size: 12px;
+}
+
 @media (max-width: 576px) { 
 	#index-heading {
 		font-size: 14px;
@@ -186,6 +234,10 @@
 	
 	#partners_row {
 		margin: 20px;
+	}
+	
+	.task_request_modal_img {
+		width: 80px;
 	}
 }
 </style>
