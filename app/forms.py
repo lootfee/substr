@@ -4,26 +4,30 @@ from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextA
 from wtforms.validators import DataRequired, ValidationError, Email, EqualTo, Length, InputRequired
 from app.models import User, Company
 from flask_wtf.file import FileField, FileRequired, FileAllowed
+from wtforms.fields.html5 import DateField
 
 class LoginForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired()])
-    password = PasswordField('Password', validators=[DataRequired()])
-    remember_me = BooleanField('Remember Me')
-    submit_login = SubmitField('Sign In')
+	#username = StringField('Username', validators=[DataRequired()])
+	email = StringField('Email', validators=[DataRequired(), Email()])
+	password = PasswordField('Password', validators=[DataRequired()])
+	remember_me = BooleanField('Remember Me')
+	submit_login = SubmitField('Sign In')
 	
 class RegistrationForm(FlaskForm):
-	username = StringField('Username', validators=[DataRequired(), Length(min=4, max=15)])
+	username = StringField('Full name', validators=[DataRequired(), Length(min=4, max=15)])
 	email = StringField('Email', validators=[DataRequired(), Email()])
 	contact_info = StringField('Contact number', validators=[DataRequired()], default="+639")
+	address = StringField('Address', validators=[DataRequired()])
+	birthday = DateField('Birthday', validators=[DataRequired()], format='%Y-%m-%d')
 	password = PasswordField('Password', validators=[DataRequired()])
 	password2 = PasswordField(
 		'Repeat Password', validators=[DataRequired(), EqualTo('password')])
 	submit = SubmitField('Register')
 
-	def validate_username(self, username):
+	'''def validate_username(self, username):
 		user = User.query.filter_by(username=username.data).first()
 		if user is not None:
-			raise ValidationError('Please use a different username.')
+			raise ValidationError('Please use a different username.')'''
 
 	def validate_email(self, email):
 		user = User.query.filter_by(email=email.data).first()
@@ -31,20 +35,20 @@ class RegistrationForm(FlaskForm):
 			raise ValidationError('Please use a different email address.')
 			
 class EditProfileForm(FlaskForm):
-	username = StringField('Username', validators=[DataRequired()])
+	username = StringField('Full name', validators=[DataRequired()])
 	email = StringField('Email', validators=[DataRequired(), Email()])
 	submit = SubmitField('Submit')
 
-	def __init__(self, original_username, original_email, *args, **kwargs):
+	def __init__(self, original_email, *args, **kwargs):
 		super(EditProfileForm, self).__init__(*args, **kwargs)
-		self.original_username = original_username
+		#self.original_username = original_username
 		self.original_email = original_email
 
-	def validate_username(self, username):
+	'''def validate_username(self, username):
 		if username.data != self.original_username:
 			user = User.query.filter_by(username=self.username.data).first()
 			if user is not None:
-				raise ValidationError('Please use a different username.')
+				raise ValidationError('Please use a different username.')'''
 				
 	def validate_email(self, email):
 		if email.data != self.original_email:
@@ -141,3 +145,9 @@ class OrderCheckoutForm(FlaskForm):
 	order_id = HiddenField('order_id')
 	order_quantity = HiddenField('qty')
 	checkout_submit = SubmitField('Checkout')
+	
+	
+
+class TaskRequestForm(FlaskForm):
+	task_type = SelectField('Task type', choices=[('Purchase', 'Purchase'), ('Pickup', 'Pickup'), ('Proxy', 'Proxy')])
+	task_description = StringField('Description', validators=[DataRequired(), Length(max=100)])
