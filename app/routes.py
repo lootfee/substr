@@ -1,5 +1,5 @@
 from flask import render_template, flash, redirect, url_for, request, jsonify
-from app import app, db, mail, photos, gmaps
+from app import app, db, mail, photos
 import os
 from flask_login import current_user, login_user, login_required, logout_user
 from app.models import User, Company, Submenu, FoodItem, Orders, TaskRequests
