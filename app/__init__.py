@@ -13,7 +13,7 @@ from flask_moment import Moment
 #from flask_googlemaps import GoogleMaps
 #import googlemaps
 #from geopy.geocoders import Nominatim
-import gmaps
+#import gmaps
 
 
 app = Flask(__name__)
@@ -28,7 +28,7 @@ moment = Moment(app)
 photos = UploadSet('photos', IMAGES)
 configure_uploads(app, photos)
 patch_request_class(app, size=629145)
-gmaps.configure(api_key=os.getenv('GOOGLE_API_KEY'))
+#gmaps.configure(api_key=os.getenv('GOOGLE_API_KEY'))
 #gmaps = googlemaps.Client(key=os.getenv('GOOGLE_API_KEY'))
 #google_maps = GoogleMaps(app)
 #geolocator = Nominatim()
