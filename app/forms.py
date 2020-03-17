@@ -150,4 +150,7 @@ class OrderCheckoutForm(FlaskForm):
 
 class TaskRequestForm(FlaskForm):
 	task_type = SelectField('Task type', choices=[('Purchase', 'Purchase'), ('Pickup', 'Pickup'), ('Proxy', 'Proxy')])
-	task_description = StringField('Description', validators=[DataRequired(), Length(max=100)])
+	address_from = StringField('From', validators=[DataRequired()])
+	address_to = StringField('To', validators=[DataRequired()])
+	task_description = TextAreaField('Description', validators=[DataRequired(), Length(max=100)])
+	submit_task_form = SubmitField('Submit')

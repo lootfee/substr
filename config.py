@@ -14,6 +14,7 @@ class Config(object):
 	MAIL_USERNAME = os.getenv('MAIL_USERNAME')
 	MAIL_PASSWORD = os.getenv('MAIL_PASSWORD')
 	ADMINS = os.getenv('ADMINS')
+	GOOGLEMAPS_KEY = os.getenv('GOOGLE_API_KEY')
 	OAUTH_CREDENTIALS = {
 		'facebook': {
 			'id': os.getenv('FACEBOOK_TEST_ID'),

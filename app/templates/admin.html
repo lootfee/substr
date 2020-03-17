@@ -3,6 +3,39 @@
 
 {% block app_content %}
 <div class="container">
+	{% if pending_task_requests %}
+	<div class="row">
+		<div class="col-md-12 col-sm-12 col-12">
+			<h4>Task requests</h4>
+		</div>
+	</div>
+	<table class="table table-hover">
+		<thead>
+			<th scope="col">Task ID</th>
+			<th scope="col">Requested by</th>
+			<th scope="col">From Address</th>
+			<th scope="col">To Address</th>
+			<th scope="col">Description</th>
+			<th scope="col">Action</th>
+		</thead>
+		<tbody>
+			{% for p in pending_task_requests %}
+			<tr>
+			<th scope="row">{{ p.id }}</th>
+			<td>{{ p.requested_by.username }}</td>
+			<td>{{ p.from_address }}</td>
+			<td>{{ p.to_address }}</td>
+			<td>{{ p.description }}</td>
+			<td>
+				<a href="{{url_for('index') }}"><button class="btn btn-sm btn-primary">Accept</button></a>
+				<a href="{{url_for('index') }}"><button class="btn btn-sm btn-warning">Reject</button></a>
+			</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+	{% endif %}
+
 	{% if pending_requests %}
 	<div class="row">
 		<div class="col-md-12 col-sm-12 col-12">

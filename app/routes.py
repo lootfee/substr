@@ -1,7 +1,8 @@
 from flask import render_template, flash, redirect, url_for, request, jsonify
-from app import app, db, mail, photos
+from app import app, db, mail, photos, gmaps
+import os
 from flask_login import current_user, login_user, login_required, logout_user
-from app.models import User, Company, Submenu, FoodItem, Orders
+from app.models import User, Company, Submenu, FoodItem, Orders, TaskRequests
 from app.forms import LoginForm, RegistrationForm, EditProfileForm, ResetPasswordRequestForm, ResetPasswordForm, BecomePartnerForm, EditCompanyForm, AddAdminForm, AddStaffForm, AddSubMenuForm, AddFoodItemForm, EditFoodItemForm, OrderListForm, OrderCheckoutForm, TaskRequestForm
 from werkzeug.urls import url_parse
 from datetime import datetime
@@ -10,6 +11,9 @@ from oauth import OAuthSignIn
 from flask_mail import Message
 import json
 from sqlalchemy.orm import class_mapper
+#from flask_googlemaps import GoogleMaps
+#from flask_googlemaps import Map
+#from flask_googlemaps import get_address, get_coordinates
 
 
 '''def serialize(model):  for creating json from sqlalchemy
@@ -60,6 +64,13 @@ def index():
 			return redirect(url_for('index'))
 		return redirect(url_for('index'))
 	task_request_form = TaskRequestForm()
+	if task_request_form.validate_on_submit():
+		task = TaskRequests(requester_id=current_user.id, from_address=task_request_form.address_from.data, to_address=task_request_form.address_to.data, description=task_request_form.task_description.data)
+		task.date_requested = datetime.utcnow()
+		db.session.add(task)
+		db.session.commit()
+		flash('Your request has been processed. Our tasks coordinator will contact you in a short while. Thank you for using Substr.')
+		return redirect(url_for('index'))
 	return render_template('index.html', become_partner_form=become_partner_form, restaurants=restaurants, task_request_form=task_request_form)
 	
 	
@@ -71,7 +82,7 @@ def login():
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
         if user is None or not user.check_password(form.password.data):
-            flash('Invalid username or password')
+            flash('Invalid email or password')
             return redirect(url_for('login'))
         login_user(user, remember=form.remember_me.data)
         next_page = request.args.get('next')
@@ -139,17 +150,19 @@ def sw():
 	
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-    if current_user.is_authenticated:
-        return redirect(url_for('index'))
-    form = RegistrationForm()
-    if form.validate_on_submit():
-        user = User(username=form.username.data, email=form.email.data, address=form.address.data, birthday=form.birthday.data)
-        user.set_password(form.password.data)
-        db.session.add(user)
-        db.session.commit()
-        flash('Congratulations, you are now a registered user!')
-        return redirect(url_for('login'))
-    return render_template('register.html', title='Register', form=form)
+	if current_user.is_authenticated:
+		return redirect(url_for('index'))
+	gmaps_api = os.getenv('GOOGLE_API_KEY')
+	print(gmaps_api)
+	form = RegistrationForm()
+	if form.validate_on_submit():
+		user = User(username=form.username.data, email=form.email.data, address=form.address.data, birthday=form.birthday.data)
+		user.set_password(form.password.data)
+		db.session.add(user)
+		db.session.commit()
+		flash('Congratulations, you are now a registered user!')
+		return redirect(url_for('login'))
+	return render_template('register.html', title='Register', form=form, gmaps_api=gmaps_api)
 	
 	
 @app.route('/edit_profile', methods=['GET', 'POST'])
@@ -213,7 +226,8 @@ def admin():
 			return redirect(url_for('index'))
 	pending_requests = Company.query.filter(Company.date_requested.isnot(None)).filter_by(date_approved=None).all()
 	partners = Company.query.filter(Company.date_approved.isnot(None)).all()
-	return render_template('admin.html', pending_requests=pending_requests, partners=partners)
+	pending_task_requests = TaskRequests.query.filter_by(date_completed=None).all()
+	return render_template('admin.html', pending_requests=pending_requests, partners=partners, pending_task_requests=pending_task_requests)
 	
 
 @app.route('/approve_request/<comp_id>')

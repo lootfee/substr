@@ -1,8 +1,10 @@
-from app import db, login
+from app import app, db, login
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from datetime import datetime
 import hashlib
+from time import time
+import jwt
 
 admins = db.Table('admins',
 	db.Column('user', db.Integer, db.ForeignKey('user.id')),
@@ -31,6 +33,8 @@ class User(UserMixin, db.Model):
 	last_seen = db.Column(db.DateTime, default=datetime.utcnow)
 	
 	orders = db.relationship('Orders', backref=db.backref('ordered_by', lazy=True), lazy='dynamic')
+	#task_requests = db.relationship('TaskRequests', backref=db.backref('requested_by', lazy=True), lazy='dynamic')
+	#tasks_performed = db.relationship('TaskRequests', backref=db.backref('fulfilled_by', lazy=True), lazy='dynamic')
 
 	def __repr__(self):
 		return '<User {}>'.format(self.username)
@@ -145,3 +149,17 @@ class Orders(db.Model):
 	
 	def is_ordered_by(self, user):
 		return self.ordered_by == user
+		
+
+class TaskRequests(db.Model):
+	id = db.Column(db.Integer, primary_key=True)
+	requester_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+	driver_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+	from_address = db.Column(db.String(200))
+	to_address = db.Column(db.String(200))
+	description = db.Column(db.String(2000))
+	date_requested = db.Column(db.DateTime)
+	date_completed = db.Column(db.DateTime)
+	
+	requested_by = db.relationship('User', backref=db.backref('task_request', lazy=True), foreign_keys=[requester_id])
+	fulfilled_by = db.relationship('User', backref=db.backref('task_performed', lazy=True), foreign_keys=[driver_id])
