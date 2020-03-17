@@ -130,4 +130,3 @@ dmypy.json
 
 logs/
 app/static/uploads/
-migrations/
