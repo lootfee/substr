@@ -7,6 +7,7 @@ from app.forms import LoginForm, RegistrationForm, EditProfileForm, ResetPasswor
 from werkzeug.urls import url_parse
 from datetime import datetime
 from app.email import send_password_reset_email, send_approve_partner_email
+import smtplib
 from oauth import OAuthSignIn
 from flask_mail import Message
 import json
@@ -58,8 +59,6 @@ def index():
 		#mail.send(msg)
 		try:
 			mail.send(msg)
-		except smtplib.SMTPRecipientsRefused:
-			return redirect(url_for('index'))
 		except smtplib.SMTPRecipientsRefused:
 			return redirect(url_for('index'))
 		return redirect(url_for('index'))
