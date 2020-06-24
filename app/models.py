@@ -69,10 +69,11 @@ class User(UserMixin, db.Model):
 		return self.staff_of.filter(staffs.c.company == company.id).count() > 0 or self.id == 1
 		
 	def is_substr_admin(self):
-		if self.admin_of:
+		'''company_len = Company.query.all()
+		if company_len:
 			return self.admin_of.filter(admins.c.company == 1).count() > 0 or self.id == 1
-		else:
-			return self.id == 1
+		else:'''
+		return self.id == 1
 		
 	def is_substr_staff(self):
 		return self.staff_of.filter(staffs.c.company == 1).count() > 0 or self.id == 1
