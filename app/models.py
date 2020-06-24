@@ -7,12 +7,12 @@ from time import time
 import jwt
 
 admins = db.Table('admins',
-	db.Column('user', db.Integer, db.ForeignKey('user.id')),
+	db.Column('admin', db.Integer, db.ForeignKey('user.id')),
 	db.Column('company', db.Integer, db.ForeignKey('company.id')),
 )
 
 staffs = db.Table('staffs',
-	db.Column('user', db.Integer, db.ForeignKey('user.id')),
+	db.Column('staff', db.Integer, db.ForeignKey('user.id')),
 	db.Column('company', db.Integer, db.ForeignKey('company.id')),
 )
 

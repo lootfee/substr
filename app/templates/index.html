@@ -83,11 +83,14 @@
       <div class="modal-body">
 			<div id="restaurant_carousel" class="carousel slide" data-ride="carousel">
 			  <ol class="carousel-indicators" style="bottom: 80px;">
+			  {% if restaurants %}
 				{% for r in restaurants %}
 				<li data-target="#restaurant_carousel" class="carousel-indicator-list" set-active="{{ r.show_order }}" data-slide-to="{{ r.show_order }}"></li>
 				{% endfor %}
 			  </ol>
+			  {% endif %}
 			  <div class="carousel-inner">
+				{% if restaurants %}
 				{% for r in restaurants %}
 				<div class="carousel-item" set-active="{{ r.show_order }}">
 				  <img class="d-block w-100"  src="https://images.weserv.nl/?url={{ r.cover_pic}}&h=300" alt="{{ r.name }} cover pic" style="height: 300px;">
@@ -99,6 +102,7 @@
 				  </div>
 				</div>
 				{% endfor %}
+				{% endif %}
 			  </div>
 			  <a class="carousel-control-prev" href="#restaurant_carousel" role="button" data-slide="prev">
 				<span class="carousel-control-prev-icon" aria-hidden="true" style="background-color: black;"></span>
@@ -154,29 +158,6 @@
 			</div>
 		</div>
 		{{ wtf.quick_form(task_request_form)}}
-        <!--div class="row text-center">
-			<div class="col-md-4 col-sm-4 col-4 task_icons">
-				<a href="{{url_for('index')}}">
-					<h5>Purchase</h5>
-					<img class="task_request_modal_img" src="https://res.cloudinary.com/substr/image/upload/v1551694966/Purchase.png" alt="purchase logo" width="100px;">
-					<div class="task_req_desc">We will purchase for you an item or two from the store and deliver them to you.</div>
-				</a>
-			</div>
-			<div class="col-md-4 col-sm-4 col-4 task_icons">
-				<a href="{{url_for('index')}}">
-					<h5>Pickup</h5>
-					<img class="task_request_modal_img" src="https://res.cloudinary.com/substr/image/upload/v1551694966/Pickup.png" alt="pickup logo" width="100px;">
-					<div class="task_req_desc">We will pick-up or deliver an item for you so you can use your time on things that matter more.</div>
-				</a>
-			</div>
-			<div class="col-md-4 col-sm-4 col-4 task_icons">
-				<a href="{{url_for('index')}}">
-					<h5>Proxy</h5>
-					<img class="task_request_modal_img" src="https://res.cloudinary.com/substr/image/upload/v1551694965/Proxy.png" alt="proxy logo" width="100px;">
-					<div class="task_req_desc">Skip the long, boring queues. We'll do the falling-in-line for you.</div>
-				</a>
-			</div>
-		</div-->
       </div>
       <div class="modal-footer col-md-12 col-sm-12 col-12">
 	  

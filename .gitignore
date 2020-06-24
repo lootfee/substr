@@ -128,5 +128,5 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-logs/
-app/static/uploads/
+#logs/
+#app/static/uploads/
